@@ -1,0 +1,921 @@
+{
+ "day": {
+  "iso": "2026-10-01",
+  "label": "Seed edition, 1 October 2026 (replaced by the first automatic run)",
+  "updated": "14:31 CEST",
+  "edition": "seed-2026-10-01"
+ },
+ "events": [
+  {
+   "id": "kyiv-long-attack",
+   "tone": "urgent",
+   "icon": "missile",
+   "weight": "heavy",
+   "title": "Kyiv endures one of its longest sustained attacks of the war",
+   "place": "Kyiv",
+   "country": "Ukraine",
+   "flag": "🇺🇦",
+   "lat": 50.45,
+   "lon": 30.52,
+   "what": "Russia launched 188 drones, 86 of them jet-powered, together with Zircon, Onyx and Iskander missiles in an assault that ran through the night and most of the day. Ukraine's air force said it shot down or suppressed five missiles and 155 drones. Four people were killed and eight injured in the capital, and the power supply was damaged. Airports at Rzeszow and Lublin in Poland briefly suspended operations while the attack was under way.",
+   "why": "The length of the attack is the new part: a strike that lasts a day rather than an hour keeps a whole city in shelters and keeps repair crews off the streets. Hitting the grid in early October rather than midwinter means the damage has to be undone before the heating season, which is why Ukrainian officials treat each autumn strike as a winter one. Rzeszow matters because it is the main gateway through which Western supplies enter Ukraine by road.",
+   "stats": [
+    {
+     "v": "188",
+     "l": "drones launched"
+    },
+    {
+     "v": "4",
+     "l": "killed"
+    },
+    {
+     "v": "155",
+     "l": "drones downed"
+    }
+   ],
+   "jargon": {
+    "term": "Jet-powered drone",
+    "def": "An attack drone with a small jet engine instead of a propeller. It flies several times faster, which leaves air defences far less time to react."
+   }
+  },
+  {
+   "id": "moldova-airspace-breaches",
+   "tone": "neutral",
+   "icon": "alert",
+   "weight": "normal",
+   "title": "Drones cross into Moldova three times in a single day",
+   "place": "Chisinau",
+   "country": "Moldova",
+   "flag": "🇲🇩",
+   "lat": 47.01,
+   "lon": 28.86,
+   "what": "Drones entered Moldovan airspace three times on Wednesday during the Russian attack on Ukraine. One crashed near the village of Hirbovat before dawn, a second prompted authorities to close airspace over the north and centre of the country, and a third crossed in the evening from Ukraine's Vinnytsia region. Romania's defence ministry detected an aerial target on radar and scrambled Spanish F-18 jets stationed there as a precaution; it said nothing entered Romanian airspace.",
+   "why": "Moldova is not in NATO and has almost no air defence of its own, so a drone that strays across its border is answered by closing the sky rather than shooting anything down. Each closure grounds civil aviation and reminds a country of three million that it sits beside a war it is not part of. The Spanish jets flying from Romania show the other half of the arrangement: the alliance watches the airspace next door without being in it.",
+   "stats": [
+    {
+     "v": "3",
+     "l": "incursions in a day"
+    },
+    {
+     "v": "0",
+     "l": "reported injuries"
+    }
+   ]
+  },
+  {
+   "id": "kaliningrad-nuclear-warning",
+   "tone": "urgent",
+   "icon": "flagpost",
+   "weight": "normal",
+   "title": "Moscow raises the nuclear question over Kaliningrad access",
+   "place": "Kaliningrad",
+   "country": "Russia",
+   "flag": "🇷🇺",
+   "lat": 54.71,
+   "lon": 20.51,
+   "what": "Russia warned NATO that it could deploy nuclear weapons if the alliance tried to cut off Kaliningrad, its Baltic exclave wedged between Poland and Lithuania, and accused NATO of preparing an air and naval blockade. Secretary-General Mark Rutte replied that the alliance is defensive. The nuclear specialist Nikolai Sokov said the real danger in exchanges like this is mutual miscalculation rather than any deliberate decision.",
+   "why": "Kaliningrad is Russian territory that can only be supplied across or over NATO members, which makes its access routes a standing friction point rather than a new one. Threats about weapons are cheap to make and hard to take back, and the risk is not that someone chooses to use one but that a patrol, a jet or a severed cable is misread during a standoff. Both governments state their red lines publicly for exactly that reason.",
+   "stats": [
+    {
+     "v": "2",
+     "l": "nato states around it"
+    }
+   ],
+   "jargon": {
+    "term": "Exclave",
+    "def": "A piece of a country entirely separated from the rest of it by other states. Everything from fuel to post has to cross someone else's territory to arrive."
+   }
+  },
+  {
+   "id": "gaza-ceasefire-deaths",
+   "tone": "urgent",
+   "icon": "rubble",
+   "weight": "heavy",
+   "title": "Eight killed in Gaza as ceasefire violations continue",
+   "place": "Gaza City",
+   "country": "Palestine",
+   "flag": "🇵🇸",
+   "lat": 31.52,
+   "lon": 34.45,
+   "what": "Israeli attacks on Wednesday killed eight Palestinians, including the journalist Muhammad Abdel Aziz al-Najjar, in the Tal al-Hawa neighbourhood of Gaza City, near al-Shifa Hospital, and in Deir el-Balah and Khan Younis. Palestinian authorities count 1,431 deaths and 5,026 wounded since the ceasefire took effect nearly a year ago, within a total of 74,032 deaths since October 2023. The United Nations says the share of destroyed buildings has risen 9 percent since the ceasefire began, with about 200,000 structures damaged across the strip.",
+   "why": "A ceasefire that holds on paper while producing a daily casualty list is the condition most of Gaza now lives under, and it governs whether aid convoys move and whether families return to damaged neighbourhoods. The destruction figures matter because rubble is not only a loss of housing: clearing it is the precondition for water, sewage and electricity coming back. Journalists dying weighs beyond the individual loss, since nearly all reporting from inside Gaza is done by local reporters.",
+   "stats": [
+    {
+     "v": "8",
+     "l": "killed wednesday"
+    },
+    {
+     "v": "1,431",
+     "l": "since ceasefire"
+    },
+    {
+     "v": "82%",
+     "l": "buildings damaged"
+    }
+   ]
+  },
+  {
+   "id": "iraq-us-mission-ends",
+   "tone": "neutral",
+   "icon": "flagpost",
+   "weight": "normal",
+   "title": "The US ends a twelve-year military mission in Iraq",
+   "place": "Baghdad",
+   "country": "Iraq",
+   "flag": "🇮🇶",
+   "lat": 33.31,
+   "lon": 44.37,
+   "what": "The United States and its coalition partners formally closed the military mission begun in 2014 against Islamic State, completing a two-year phased withdrawal from the last bases. Iraqi forces now hold primary responsibility for security, with American involvement continuing as targeted training and intelligence support. Prime Minister Ali al-Zaidi declared 1 October Sovereignty Day. American troops first invaded in 2003, left in 2011, and returned three years later.",
+   "why": "The departure tests something that has never held for long in Iraq, which is whether its army can hold ground without foreign air power behind it. For Iraqis the stake is practical rather than symbolic, because the collapse of those same forces in 2014 is what allowed Islamic State to take Mosul. A withdrawal also changes who has leverage in Baghdad, and Iran-aligned factions have spent years demanding precisely this.",
+   "stats": [
+    {
+     "v": "12 yrs",
+     "l": "mission length"
+    },
+    {
+     "v": "2003",
+     "l": "first invasion"
+    },
+    {
+     "v": "1 Oct",
+     "l": "sovereignty day"
+    }
+   ]
+  },
+  {
+   "id": "pakistan-afghan-airstrikes",
+   "tone": "urgent",
+   "icon": "missile",
+   "weight": "heavy",
+   "title": "Pakistani air raids hit Afghan provinces as border fighting widens",
+   "place": "Kunar",
+   "country": "Afghanistan",
+   "flag": "🇦🇫",
+   "lat": 34.87,
+   "lon": 71.15,
+   "what": "Pakistan carried out air strikes on Kunar in northeastern Afghanistan and Helmand in the south late on Wednesday. Afghanistan's Taliban government said at least nine people were killed, among them women and children, eleven were wounded and three houses were destroyed. Pakistan's information ministry said twenty-two fighters of the Pakistani Taliban and the Balochistan Liberation Army were killed on credible intelligence. The Taliban spokesman Zabihullah Mujahid called the strikes an aggression; Pakistan denies targeting civilians, and neither account has been independently verified.",
+   "why": "The two governments have spent a decade disagreeing about armed groups that cross the Durand Line, and each round of strikes now follows the same pattern of incompatible casualty claims. What makes this round costly is that the border is also a trade route: closures strand lorries and push up food prices in Afghan cities that depend on Pakistani imports. The United Nations has recorded more than 1,100 civilian casualties from cross-border violence this year.",
+   "stats": [
+    {
+     "v": "9",
+     "l": "killed, kabul says"
+    },
+    {
+     "v": "22",
+     "l": "killed, islamabad says"
+    },
+    {
+     "v": "1,100+",
+     "l": "civilian casualties, 2026"
+    }
+   ],
+   "jargon": {
+    "term": "Durand Line",
+    "def": "The 2,600-kilometre border drawn between Afghanistan and British India in 1893. Pakistan treats it as settled; no Afghan government ever has."
+   }
+  },
+  {
+   "id": "korea-border-fortification",
+   "tone": "neutral",
+   "icon": "flagpost",
+   "weight": "normal",
+   "title": "Seoul demands the North halt fortification work at the border",
+   "place": "Panmunjom",
+   "country": "South Korea",
+   "flag": "🇰🇷",
+   "lat": 37.96,
+   "lon": 126.68,
+   "what": "South Korea's Joint Chiefs of Staff formally called on North Korea to stop building fortifications near the border, days after a blast wounded two South Korean soldiers that Seoul blamed on newly laid northern mines. North Korea's state news agency dismissed the investigation as a farce, Kim Yo Jong denied any northern involvement, and Pyongyang warned that Seoul would pay a price. Seoul is seeking an apology.",
+   "why": "The strip between the two Koreas is the most heavily mined land on earth, and mines move: rain and floods wash them out of marked fields and into places soldiers patrol. That is why each incident turns into an argument about intent, with no neutral party able to settle it. The fortification work is the slower story, because walls and trenches make the de facto border harder to reverse than any declaration does.",
+   "stats": [
+    {
+     "v": "2",
+     "l": "soldiers wounded"
+    },
+    {
+     "v": "1953",
+     "l": "armistice, not a treaty"
+    }
+   ]
+  },
+  {
+   "id": "france-school-protests",
+   "tone": "neutral",
+   "icon": "protest",
+   "weight": "normal",
+   "title": "French school protests widen, with more than 600 detained",
+   "place": "Paris",
+   "country": "France",
+   "flag": "🇫🇷",
+   "lat": 48.86,
+   "lon": 2.35,
+   "what": "More than 600 people were detained across France on Wednesday as student protests spread to 356 secondary schools. Eighty-three police officers and gendarmes were reported injured, along with 32 teachers and pupils. Students say classes are overcrowded and teaching posts are going unfilled. President Emmanuel Macron said the grievances were legitimate but rejected violent methods, while the opposition leader Jean-Luc Melenchon criticised the government's response.",
+   "why": "School strikes are an unusual form of pressure because most of the people walking out cannot vote, so the leverage has to come from disruption and from parents rather than the ballot box. The underlying complaint is measurable: an unfilled post in a staff room is a class without a teacher, and France has struggled for years to attract applicants. How a government handles hundreds of detained schoolchildren tends to become the story in its own right, which is what both sides are now arguing about.",
+   "stats": [
+    {
+     "v": "600+",
+     "l": "detained"
+    },
+    {
+     "v": "356",
+     "l": "schools affected"
+    },
+    {
+     "v": "115",
+     "l": "reported injured"
+    }
+   ]
+  },
+  {
+   "id": "uk-eu-relationship-review",
+   "tone": "neutral",
+   "icon": "flagpost",
+   "weight": "normal",
+   "title": "Britain opens a formal review of its relationship with the EU",
+   "place": "London",
+   "country": "United Kingdom",
+   "flag": "🇬🇧",
+   "lat": 51.51,
+   "lon": -0.13,
+   "what": "Prime Minister Andy Burnham said the government will examine whether to keep the current arrangements, seek a customs union, apply for single-market membership or rejoin the European Union outright. Downing Street has commissioned work from think tanks and pollsters on where public opinion sits. President Emmanuel Macron welcomed the prospect. Officials cautioned that full membership would require accepting freedom of movement and renegotiating budget rebates, at an estimated cost of roughly five billion pounds a year.",
+   "why": "Each option on that list is a different trade: a customs union removes checks on goods but ends independent trade deals, single-market membership adds services and free movement, and rejoining means the budget and the rules as they now stand rather than as Britain left them. The five billion figure is the opening number in a negotiation, not a price tag. Nothing changes quickly either way, because every route requires the agreement of twenty-seven other governments.",
+   "stats": [
+    {
+     "v": "4",
+     "l": "options under review"
+    },
+    {
+     "v": "£5bn",
+     "l": "estimated annual cost"
+    },
+    {
+     "v": "27",
+     "l": "governments to agree"
+    }
+   ],
+   "jargon": {
+    "term": "Customs union",
+    "def": "An agreement to charge the same tariffs on imports from outside, so goods move between members without checks. The price is giving up separate trade deals of your own."
+   }
+  },
+  {
+   "id": "us-inflation-eases",
+   "tone": "neutral",
+   "icon": "chart",
+   "weight": "normal",
+   "title": "US inflation comes in softer, but long bond yields keep climbing",
+   "place": "New York",
+   "country": "United States",
+   "flag": "🇺🇸",
+   "lat": 40.71,
+   "lon": -74.01,
+   "what": "American personal consumption prices rose 3.4 percent in the year to August, below the 3.7 percent expected, with the core measure at 3.0 percent against a 3.3 percent forecast. Private employers added 90,000 jobs in September according to the ADP survey, and the Chicago Business Barometer rebounded 11.7 points to 58.8. Markets closed mixed on Wednesday, with the Nasdaq higher while the Dow and S&P 500 slipped. Ten-year Treasury yields reached 5.30 percent and thirty-year yields 5.64 percent.",
+   "why": "Softer inflation lowers the odds of another rate rise next month, which is why technology shares did well on the day. The bond market is telling a different story: a thirty-year yield above 5.6 percent means the cost of borrowing for decades has reset upward regardless of what the central bank does next. That number, not the headline rate, is what prices mortgages, company debt and government borrowing, so it reaches households far more directly.",
+   "stats": [
+    {
+     "v": "3.4%",
+     "l": "headline inflation"
+    },
+    {
+     "v": "3.0%",
+     "l": "core measure"
+    },
+    {
+     "v": "5.64%",
+     "l": "30-year yield"
+    }
+   ],
+   "jargon": {
+    "term": "Core PCE",
+    "def": "The US central bank's preferred inflation gauge. It leaves out food and energy, which jump around, to show the slower trend underneath."
+   }
+  },
+  {
+   "id": "iran-rial-record-low",
+   "tone": "urgent",
+   "icon": "coin",
+   "weight": "normal",
+   "title": "Iran's rial hits a record low past 2.5 million to the dollar",
+   "place": "Tehran",
+   "country": "Iran",
+   "flag": "🇮🇷",
+   "lat": 35.69,
+   "lon": 51.39,
+   "what": "The Iranian rial fell to an unprecedented 2.5 million to the dollar, beating a record set less than a month earlier, as the seven-month war with Israel and the United States continues to batter the economy. Washington imposed sanctions on ten entities in China, Hong Kong and Pakistan accused of helping Iran acquire weapons. Qatar has been mediating over an Iranian proposal to reopen the Strait of Hormuz within a week in exchange for lifting port blockades, releasing frozen assets and waiving oil sanctions; President Trump rejected the offer, but Tehran has since received an official American response.",
+   "why": "A collapsing currency is the quickest way a war reaches people nowhere near the fighting: imported medicine, machinery and food reprice within days while wages do not. Savings held in rials lose value faster than most households can move them, which is why Iranians buy gold and dollars whenever they can. The Hormuz offer links all of this to fuel prices worldwide, since roughly a fifth of the world's oil normally passes through that channel, and Brent crude is trading near 100 dollars a barrel.",
+   "stats": [
+    {
+     "v": "2.5m",
+     "l": "rials per dollar"
+    },
+    {
+     "v": "10",
+     "l": "new sanctions targets"
+    },
+    {
+     "v": "$100",
+     "l": "brent crude"
+    }
+   ],
+   "jargon": {
+    "term": "Devaluation",
+    "def": "When a currency buys less foreign money than before. Everything imported gets dearer, so inflation arrives even if nothing changes at home."
+   }
+  },
+  {
+   "id": "china-pmi-expansion",
+   "tone": "neutral",
+   "icon": "factory",
+   "weight": "normal",
+   "title": "China's factory gauge edges back into growth at 50.1",
+   "place": "Beijing",
+   "country": "China",
+   "flag": "🇨🇳",
+   "lat": 39.9,
+   "lon": 116.41,
+   "what": "China's official manufacturing purchasing managers' index rose to 50.1 in September from 49.8 in August, crossing back above the line that separates expansion from contraction for the first time in three months. The private RatingDog index reached 52.1, a five-month high, and the non-manufacturing gauge rose to 50.2 from 49.0. Reuters attributed the improvement to fewer weather disruptions and global demand tied to artificial intelligence. Consumption, investment and property confidence remain weak, and the CSI 300 share index fell about 13 percent over the quarter, its worst since the pandemic lockdowns.",
+   "why": "China makes a large share of the world's manufactured goods, so whether its factories are busy sets order books and prices from Vietnam to Germany. A reading just above 50 is not a recovery; it means roughly as many firms reported improvement as decline. The gap between busy factories and nervous households is the real story, because an economy cannot keep producing more than its own consumers will buy without exporting the difference, which is what turns a domestic problem into a trade dispute.",
+   "stats": [
+    {
+     "v": "50.1",
+     "l": "official pmi"
+    },
+    {
+     "v": "52.1",
+     "l": "private survey"
+    },
+    {
+     "v": "-13%",
+     "l": "csi 300, quarter"
+    }
+   ],
+   "jargon": {
+    "term": "PMI",
+    "def": "A monthly survey asking factory managers whether business improved or worsened. Above 50 means more said better than worse; below 50 means the reverse."
+   }
+  },
+  {
+   "id": "brazil-beef-tariff-wall",
+   "tone": "neutral",
+   "icon": "tanker",
+   "weight": "normal",
+   "title": "Brazilian beef runs into a 67% Chinese tariff wall",
+   "place": "Santos",
+   "country": "Brazil",
+   "flag": "🇧🇷",
+   "lat": -23.96,
+   "lon": -46.33,
+   "what": "Brazilian beef shipments to China now face an extra 55 percent duty after the annual low-tariff import quota was exhausted on 29 September, taking the total charge on above-quota beef to 67 percent. Brazil had filled its 1.1 million tonne allowance. China bought 1.68 million tonnes of Brazilian beef last year, about 48 percent of Brazil's beef exports. Industry groups estimate the quota covers only around 65 percent of last year's shipments, and a new allowance of roughly 1.13 million tonnes opens in January.",
+   "why": "A quota that runs out in September rather than December means a quarter of the year in which the trade is barely viable, so cattle that would have gone to China either sit, go cheaply elsewhere, or push down prices at home. For Chinese consumers it works the other way round, raising the price of imported beef through the winter. Quotas like this are the quieter half of trade policy: no tariff is announced, the trade simply stops being worth doing partway through the year.",
+   "stats": [
+    {
+     "v": "67%",
+     "l": "total tariff"
+    },
+    {
+     "v": "1.1m t",
+     "l": "quota filled"
+    },
+    {
+     "v": "48%",
+     "l": "of brazil's exports"
+    }
+   ],
+   "jargon": {
+    "term": "Tariff quota",
+    "def": "A set quantity that can be imported at a low duty, after which a much higher rate applies. The low rate is real but strictly rationed."
+   }
+  },
+  {
+   "id": "colombia-debt-ceiling",
+   "tone": "neutral",
+   "icon": "bank",
+   "weight": "normal",
+   "title": "Colombia nears its legal debt ceiling and talks to the IMF",
+   "place": "Bogota",
+   "country": "Colombia",
+   "flag": "🇨🇴",
+   "lat": 4.71,
+   "lon": -74.07,
+   "what": "Colombia's public debt is approaching the ceiling of 71 percent of national output written into its fiscal rules, and the government has opened early talks with the International Monetary Fund. The central bank was expected to hold its policy rate at 12 percent. Separately, a study put Colombian logistics costs at 15.6 percent of the value of goods, close to double the OECD average of about 8 percent. The peso firmed 0.95 percent to 3,330 per dollar while the COLCAP index fell 0.79 percent to 2,559, and a Bogota tax reform passed that should raise about 324 million dollars a year.",
+   "why": "A legal debt ceiling is a promise a government makes to its own lenders, so approaching it forces a choice between cutting spending, raising taxes or changing the rule, and each option costs something politically. Talking to the IMF early is usually cheaper than talking to it late, because a country that waits negotiates from weakness. The logistics number explains part of how Colombia got here: goods that cost twice the OECD average to move are goods that struggle to earn export income.",
+   "stats": [
+    {
+     "v": "71%",
+     "l": "debt ceiling"
+    },
+    {
+     "v": "12%",
+     "l": "policy rate"
+    },
+    {
+     "v": "15.6%",
+     "l": "logistics cost"
+    }
+   ],
+   "jargon": {
+    "term": "Fiscal rule",
+    "def": "A law limiting how much a government may borrow. It is meant to reassure lenders, which also means breaking it is expensive even when the reasons are good."
+   }
+  },
+  {
+   "id": "lamu-refinery-groundbreaking",
+   "tone": "neutral",
+   "icon": "oil",
+   "weight": "normal",
+   "title": "East Africa breaks ground on a huge refinery at Lamu",
+   "place": "Lamu",
+   "country": "Kenya",
+   "flag": "🇰🇪",
+   "lat": -2.27,
+   "lon": 40.9,
+   "what": "President William Ruto led a groundbreaking ceremony in Lamu County for the Dangote East Africa Petroleum Refinery, costed at 15 to 17 billion dollars with a planned capacity of 700,000 barrels a day and a three-year build towards completion around 2030. Three East African countries will take a combined 30 percent stake. The ceremony went ahead despite a court status-quo order, and a hearing in Malindi over disputed land claims is set for 14 October.",
+   "why": "East Africa produces crude but has almost no capacity to turn it into diesel and petrol, so it exports oil cheaply and imports fuel dearly. A refinery of this size would change that arithmetic for a decade, which is why neighbouring governments bought in rather than building their own. Breaking ground while a court order is live is the part worth watching, because projects started ahead of their permissions are how disputes over land and compensation end up unresolved for years.",
+   "stats": [
+    {
+     "v": "$15bn+",
+     "l": "project cost"
+    },
+    {
+     "v": "700k",
+     "l": "barrels a day"
+    },
+    {
+     "v": "14 Oct",
+     "l": "court hearing"
+    }
+   ],
+   "jargon": {
+    "term": "Refinery",
+    "def": "A plant that separates crude oil into usable fuels such as diesel, petrol and jet fuel. Without one, a country with oil still has to import what it burns."
+   }
+  },
+  {
+   "id": "scotus-third-country-removals",
+   "tone": "neutral",
+   "icon": "court",
+   "weight": "normal",
+   "title": "US Supreme Court lets deportations to third countries continue",
+   "place": "Washington",
+   "country": "United States",
+   "flag": "🇺🇸",
+   "lat": 38.89,
+   "lon": -77.01,
+   "what": "The Supreme Court ruled six to three to let the administration keep deporting people to countries they have no ties to while the case proceeds, with a full hearing scheduled for December. About 25,000 people have been removed during the current term to destinations including Liberia, Equatorial Guinea, Honduras and the Central African Republic. Lawyers for those deported argue they face detention, persecution or dangerous conditions on arrival; the administration says the removals are lawful and necessary.",
+   "why": "Deportation normally means being returned to the country you came from, so sending someone to a third state raises a different question: who is then responsible for them, and under whose law. The practical answer is being negotiated country by country, often with aid or trade attached, which is why the list of receiving governments keeps growing. The December ruling will decide whether the practice stands or has to be unwound for people already sent.",
+   "stats": [
+    {
+     "v": "6-3",
+     "l": "interim ruling"
+    },
+    {
+     "v": "25,000",
+     "l": "already removed"
+    },
+    {
+     "v": "Dec",
+     "l": "full hearing"
+    }
+   ]
+  },
+  {
+   "id": "bangkok-floods",
+   "tone": "urgent",
+   "icon": "flood",
+   "weight": "heavy",
+   "title": "Bangkok drains out after its worst flooding in years",
+   "place": "Bangkok",
+   "country": "Thailand",
+   "flag": "🇹🇭",
+   "lat": 13.75,
+   "lon": 100.5,
+   "what": "Three days of rain from 24 to 27 September put main roads under water across Bangkok and neighbouring provinces, with more than 300 millimetres recorded in places and flooding reported at 37 locations. Three people died: a woman electrocuted in a car park in Khlong Chan, and two men in Bueng Kum, one who drowned while evacuating and one who was bedridden and could not leave. The city administration declared an emergency on 26 September and said draining would take two to three days once the rain stopped.",
+   "why": "Bangkok sits barely above sea level on soft ground that is still subsiding, so the city depends on pumps and canals rather than on gravity to get rid of water. That is why a storm drains in days rather than hours, and why the deaths in a flood like this are mostly electrocution and entrapment rather than fast water. The people least able to leave are the ones the emergency plans have to reach first, which is what the Bueng Kum deaths show went wrong.",
+   "stats": [
+    {
+     "v": "300 mm",
+     "l": "rain in places"
+    },
+    {
+     "v": "3",
+     "l": "killed"
+    },
+    {
+     "v": "37",
+     "l": "flooded locations"
+    }
+   ]
+  },
+  {
+   "id": "himalaya-late-monsoon-floods",
+   "tone": "urgent",
+   "icon": "flood",
+   "weight": "heavy",
+   "title": "Late monsoon floods and landslides kill dozens across South Asia",
+   "place": "Kathmandu",
+   "country": "Nepal",
+   "flag": "🇳🇵",
+   "lat": 27.72,
+   "lon": 85.32,
+   "what": "Heavy rain between 25 and 27 September caused flooding and landslides across northern India, Nepal and Thailand, killing 56 people in India, 14 in Nepal and 8 in Thailand, with many still missing. It follows the far larger disaster in August, when floods along the Nepal and China border killed about 1,450 people and left thousands unaccounted for. Search teams are working in hill districts where saturated slopes gave way onto homes and roads.",
+   "why": "Most monsoon deaths in these mountains are not drownings but burials, caused by hillsides collapsing after days of rain rather than by the rivers themselves. That is why warnings stay in force after the sky clears: the ground holds the water, and the risk, for days afterwards. Late-season rain is especially dangerous because it lands on soil already loaded from months of monsoon, so a modest storm can do what a large one would have done in June.",
+   "stats": [
+    {
+     "v": "56",
+     "l": "killed in india"
+    },
+    {
+     "v": "14",
+     "l": "killed in nepal"
+    },
+    {
+     "v": "1,450",
+     "l": "killed in august"
+    }
+   ],
+   "jargon": {
+    "term": "Landslide",
+    "def": "When a slope loses its grip and slides downhill, usually because rain has made the soil heavy and slippery. It happens in seconds and gives almost no warning."
+   }
+  },
+  {
+   "id": "borneo-peat-fires",
+   "tone": "urgent",
+   "icon": "wildfire",
+   "weight": "heavy",
+   "title": "Peat fires on Borneo push haze across Southeast Asia",
+   "place": "Palangka Raya",
+   "country": "Indonesia",
+   "flag": "🇮🇩",
+   "lat": -2.21,
+   "lon": 113.92,
+   "what": "Indonesian forest and peatland fires have continued through an unusually dry season, with more than 224,000 fire hotspots detected and roughly 230,000 acres burned on Borneo. Smoke has spread well beyond Indonesia into neighbouring countries, and air quality readings have deteriorated across the region. Fire crews are working on peat that burns below the surface.",
+   "why": "Peat is partly decayed plant matter that has been accumulating for thousands of years, and once it catches it smoulders underground where water cannot easily reach it, which is why these fires last months rather than days. The smoke is the part that reaches most people: fine particles from peat smoke travel hundreds of kilometres and push up hospital admissions for asthma and heart conditions in cities that never saw a flame. Burnt peat also releases carbon that took centuries to lock away.",
+   "stats": [
+    {
+     "v": "224k",
+     "l": "fire hotspots"
+    },
+    {
+     "v": "230k",
+     "l": "acres burned"
+    }
+   ],
+   "jargon": {
+    "term": "Peatland",
+    "def": "Waterlogged ground made of half-rotted plants, metres deep. Drained for farming it dries out, and then it burns from the inside."
+   }
+  },
+  {
+   "id": "hurricane-polo-mexico",
+   "tone": "urgent",
+   "icon": "flood",
+   "weight": "normal",
+   "title": "Hurricane Polo lands twice on Mexico's northwest coast",
+   "place": "La Paz",
+   "country": "Mexico",
+   "flag": "🇲🇽",
+   "lat": 24.14,
+   "lon": -110.31,
+   "what": "Hurricane Polo, which had peaked as a Category 5 storm, came ashore as a Category 2 in Baja California Sur and made a second landfall in Sonora, with effects reaching Sinaloa and the southwestern United States. Forecasters warned of 150 to 300 millimetres of rain. No deaths were reported in Baja California Sur; Puerto San Carlos flooded and schools across Sonora suspended classes.",
+   "why": "Baja California Sur is desert, which sounds like good news for a rain event and is not: ground that rarely absorbs water sends it straight into dry riverbeds that run through towns. Two landfalls also mean two separate windows of damage, and the second often hits communities already cut off by the first. A storm that reached Category 5 before weakening is a reminder of how quickly warm water can build one, and how much the timing of landfall decides.",
+   "stats": [
+    {
+     "v": "cat 5",
+     "l": "peak strength"
+    },
+    {
+     "v": "2",
+     "l": "landfalls"
+    },
+    {
+     "v": "300 mm",
+     "l": "rain, worst case"
+    }
+   ]
+  },
+  {
+   "id": "drc-ebola-bundibugyo",
+   "tone": "urgent",
+   "icon": "medic",
+   "weight": "heavy",
+   "title": "Congo's Ebola outbreak passes 8,000 cases and 3,900 deaths",
+   "place": "Bunia",
+   "country": "DR Congo",
+   "flag": "🇨🇩",
+   "lat": 1.56,
+   "lon": 30.25,
+   "what": "The Democratic Republic of Congo has recorded 8,067 confirmed Ebola cases and 3,901 deaths since the outbreak was declared on 15 May, a fatality rate of about 48 percent and the worst epidemic in the country's history. Ituri remains the epicentre, with Butembo in North Kivu a hotspot and cases also in Tshopo. The strain is Bundibugyo, for which no vaccine or treatment is approved; trials are under way and Tshopo has reported a complete shortage of experimental vaccine stock. The World Health Organization says the outbreak is far from over and on course to exceed the West African epidemic of 2014 to 2016.",
+   "why": "Ebola is stopped by finding everyone an infected person met and watching them, so the response depends on trust more than on medicine. Two things are breaking that here: armed conflict that displaces people in the middle of an investigation, and a strain whose early symptoms resemble malaria or typhoid, so patients arrive late or not at all. The licensed vaccines were built against a different strain, which is why trials and treatment are running at the same time rather than one after the other.",
+   "stats": [
+    {
+     "v": "8,067",
+     "l": "confirmed cases"
+    },
+    {
+     "v": "3,901",
+     "l": "deaths"
+    },
+    {
+     "v": "48%",
+     "l": "fatality rate"
+    }
+   ],
+   "jargon": {
+    "term": "Contact tracing",
+    "def": "Finding everyone an infected person may have exposed and monitoring them. It is the main tool against Ebola, because it catches cases before they infect others."
+   }
+  },
+  {
+   "id": "somalia-baidoa-hunger",
+   "tone": "urgent",
+   "icon": "migrants",
+   "weight": "heavy",
+   "title": "Fighting and hunger close in on Baidoa in southern Somalia",
+   "place": "Baidoa",
+   "country": "Somalia",
+   "flag": "🇸🇴",
+   "lat": 3.11,
+   "lon": 43.65,
+   "what": "Renewed fighting in Baidoa between government forces and loyalists of the former South West State president has killed children and damaged a health facility. Across Somalia about two million children are acutely or severely malnourished, and 26,000 people in the Baidoa area face catastrophic food insecurity. The World Food Programme now reaches about 670,000 people, down from four million when funding was at its height.",
+   "why": "Baidoa is where people go when their villages fail, which is why a fight inside the town is more damaging than its size suggests: it cuts off the place that was meant to be the refuge. The drop in food aid from four million recipients to under 700,000 is not a change in need but a change in money, and famine declarations historically arrive after the aid has already shrunk rather than before. Children are the first to show it, because malnutrition compounds faster in small bodies.",
+   "stats": [
+    {
+     "v": "2m",
+     "l": "children malnourished"
+    },
+    {
+     "v": "26,000",
+     "l": "in catastrophic hunger"
+    },
+    {
+     "v": "670k",
+     "l": "reached by wfp"
+    }
+   ],
+   "jargon": {
+    "term": "Catastrophic food insecurity",
+    "def": "The most severe level on the international hunger scale, below which famine is declared. It means people are starving, not merely going short."
+   }
+  },
+  {
+   "id": "swiss-glaciers-shrink",
+   "tone": "urgent",
+   "icon": "alert",
+   "weight": "normal",
+   "title": "Swiss glaciers lose another 5.5% of their ice this year",
+   "place": "Rhone Glacier",
+   "country": "Switzerland",
+   "flag": "🇨🇭",
+   "lat": 46.57,
+   "lon": 8.39,
+   "what": "Switzerland's glacier monitoring network GLAMOS reported a 5.5 percent loss of glacier volume in 2026, extending a decline of about 20 percent since 2021. Winter snowfall was the only reason the figure fell short of the record 6 percent lost in 2022. The Rhone and Aletsch glaciers suffered record losses, and roughly 1,200 smaller glaciers have disappeared over the past fifty years. Matthias Huss, who heads the network, said that on current warming all Swiss glaciers would be gone by the end of the century.",
+   "why": "Alpine glaciers are a water store, not just scenery: their summer melt feeds the Rhine, the Rhone and the Danube, which carry barge traffic, cool power stations and irrigate farmland far downstream. Losing a fifth of that store in five years means the buffer that evens out dry summers is going, which is a problem for Rotterdam as much as for Valais. The number is also unusually reliable, because these particular glaciers have been measured the same way for more than a century.",
+   "stats": [
+    {
+     "v": "5.5%",
+     "l": "ice lost in 2026"
+    },
+    {
+     "v": "20%",
+     "l": "lost since 2021"
+    },
+    {
+     "v": "1,200",
+     "l": "glaciers gone in 50 yrs"
+    }
+   ],
+   "jargon": {
+    "term": "Glacier volume",
+    "def": "How much ice a glacier holds, not just how far it reaches. Volume can drop sharply while the glacier's outline looks much the same in a photograph."
+   }
+  },
+  {
+   "id": "ethiopia-tigray-offensive",
+   "tone": "urgent",
+   "icon": "rubble",
+   "weight": "heavy",
+   "title": "Ethiopian forces take Alamata as the Tigray war reopens",
+   "place": "Alamata",
+   "country": "Ethiopia",
+   "flag": "🇪🇹",
+   "lat": 12.42,
+   "lon": 39.55,
+   "what": "Federal and allied forces captured Alamata, about 120 kilometres south of Mekelle, on 28 September, after Tigrayan forces launched an offensive that seized three airports and pushed into the neighbouring Afar and Amhara regions. Fifty-two civilians were killed in three days of fighting and hospitals supported by Medecins Sans Frontieres admitted more than 700 wounded. About 150,000 people have been displaced. Airports have closed, stranding foreign visitors in Lalibela, and communications and banking have been disrupted. Ethiopia's army chief has accused Eritrea, Sudan and Egypt of backing armed groups; all three deny it.",
+   "why": "The 2022 Pretoria agreement ended a war that killed an estimated 600,000 people, and the fighting now under way is a test of whether that agreement survives at all. The regional accusations are what make this dangerous beyond Ethiopia: the Horn of Africa has few borders that a war of this size respects, and Sudan is already fighting its own. For people in Tigray the immediate loss is simpler, because closed airports and dead banking networks mean aid cannot be paid for or flown in.",
+   "stats": [
+    {
+     "v": "52",
+     "l": "civilians killed"
+    },
+    {
+     "v": "700+",
+     "l": "wounded admitted"
+    },
+    {
+     "v": "150k",
+     "l": "displaced"
+    }
+   ],
+   "jargon": {
+    "term": "Pretoria agreement",
+    "def": "The November 2022 deal that halted the previous Tigray war. It set out disarmament and the return of services, and both sides accuse the other of breaking it."
+   }
+  },
+  {
+   "id": "brazil-first-round",
+   "tone": "neutral",
+   "icon": "ballot",
+   "weight": "normal",
+   "title": "Brazil votes Sunday with the runoff polling level at 42-42",
+   "place": "Brasilia",
+   "country": "Brazil",
+   "flag": "🇧🇷",
+   "lat": -15.79,
+   "lon": -47.88,
+   "what": "Brazil holds the first round of its presidential election on Sunday. A Quaest poll puts President Luiz Inacio Lula da Silva on 39 percent and Flavio Bolsonaro on 34 in the first round, and the two level at 42 percent each in a second-round matchup. The economy is giving the incumbent something to campaign on: 165,827 net formal jobs were created in August, nearly double the forecast, and unemployment stood at 5.3 percent. The Ibovespa closed up 0.46 percent at 183,828 and the real firmed to 5.20 per dollar.",
+   "why": "A dead heat going into a first round means the campaign that matters is the three weeks after it, and both camps know it. Brazil's two-round system forces whoever leads on Sunday to reach beyond their own base immediately, which usually decides the tone of the final stretch. Strong job numbers help an incumbent but reach voters slowly, because people judge an economy by their own bills rather than by a national statistic.",
+   "stats": [
+    {
+     "v": "42-42",
+     "l": "runoff poll"
+    },
+    {
+     "v": "165k",
+     "l": "jobs in august"
+    },
+    {
+     "v": "5.3%",
+     "l": "unemployment"
+    }
+   ],
+   "jargon": {
+    "term": "Runoff",
+    "def": "A second vote between the top two candidates when nobody wins outright. It forces both to appeal beyond their own supporters to win."
+   }
+  },
+  {
+   "id": "nauru-seabed-rules",
+   "tone": "neutral",
+   "icon": "speaker",
+   "weight": "normal",
+   "title": "Nauru presses the seabed authority to finish its mining rules",
+   "place": "Yaren",
+   "country": "Nauru",
+   "flag": "🇳🇷",
+   "lat": -0.55,
+   "lon": 166.92,
+   "what": "Nauru's president called on the International Seabed Authority to complete its rules for deep-sea mining after five years of delay. In American Samoa, the governor has come out against a proposed United States lease sale covering 31 million acres of seabed, which is targeted for November. Pacific governments are split, with some seeing a revenue source and others seeking a moratorium until the environmental effects are better understood.",
+   "why": "The metals sought on the seabed sit mostly under Pacific waters while the companies that want them are mostly not Pacific, so the question of who writes the rules decides who captures the value. An authority that has not finished its code is the worst of both worlds, because projects advance under interim arrangements that nobody agreed to. Pacific states have little leverage besides the law of the sea and their votes, which is why these arguments are made in international forums rather than in boardrooms.",
+   "stats": [
+    {
+     "v": "5 yrs",
+     "l": "rules delayed"
+    },
+    {
+     "v": "31m",
+     "l": "acres in us sale"
+    }
+   ],
+   "jargon": {
+    "term": "Deep-sea mining",
+    "def": "Collecting metal-rich nodules from the ocean floor, kilometres down. The deposits are real; what happens to the ecosystems around them is largely untested."
+   }
+  },
+  {
+   "id": "pacific-defence-nadi",
+   "tone": "neutral",
+   "icon": "boat",
+   "weight": "normal",
+   "title": "Pacific defence ministers raise alarm over missile tests at sea",
+   "place": "Nadi",
+   "country": "Fiji",
+   "flag": "🇫🇯",
+   "lat": -17.8,
+   "lon": 177.42,
+   "what": "Defence representatives from Australia, Chile, Fiji, France, New Zealand, Papua New Guinea and Tonga, meeting in Nadi, expressed concern over ballistic missile testing in Pacific waters, the second such test in two years. Australia committed 312 million Australian dollars over ten years to the Waqa Moana maritime initiative and has supplied 23 Guardian-class patrol boats to twelve Pacific partners. The Pacific Response Group's headquarters rotated to New Zealand on 1 July, and Fiji has offered to host it from July 2028. India is separately providing 20 sea ambulances to Pacific nations by March 2027 and building a 100-bed hospital in Fiji.",
+   "why": "Pacific countries govern enormous stretches of ocean with very small budgets, so a patrol boat is not a military asset so much as the only way to police fishing, smuggling and search-and-rescue across an area the size of a continent. Missile tests in those waters are treated as a sovereignty question for the same reason: the sea is the territory. The competing offers of boats, hospitals and ambulances are how larger powers now bid for influence in the region.",
+   "stats": [
+    {
+     "v": "23",
+     "l": "patrol boats supplied"
+    },
+    {
+     "v": "A$312m",
+     "l": "over ten years"
+    },
+    {
+     "v": "20",
+     "l": "sea ambulances"
+    }
+   ]
+  },
+  {
+   "id": "nepal-tiger-recovery",
+   "tone": "good",
+   "icon": "chart",
+   "weight": "light",
+   "title": "Nepal's wild tiger population more than triples since 2010",
+   "place": "Chitwan",
+   "country": "Nepal",
+   "flag": "🇳🇵",
+   "lat": 27.53,
+   "lon": 84.35,
+   "what": "Nepal's wild tiger population has risen from 121 animals in 2010 to 429 in 2026, one of the largest recoveries recorded for an endangered species. The increase followed a decade of anti-poaching patrols, habitat protection and schemes that give communities living beside the parks a share of tourism income and compensation for livestock losses.",
+   "why": "Tiger numbers are a blunt but useful measure of whether a protected landscape is actually functioning, because a predator at the top of the chain needs everything below it to be intact. The community element is the part other countries study: conservation that costs villagers their goats and gives them nothing in return tends to fail, and conservation that pays them tends not to. Nepal did this while remaining a low-income country, which undercuts the argument that protection is something only rich states can afford.",
+   "stats": [
+    {
+     "v": "429",
+     "l": "tigers in 2026"
+    },
+    {
+     "v": "121",
+     "l": "tigers in 2010"
+    }
+   ]
+  },
+  {
+   "id": "asian-games-nagoya",
+   "tone": "good",
+   "icon": "footballer",
+   "weight": "light",
+   "title": "The Asian Games reach day twelve in Aichi and Nagoya",
+   "place": "Nagoya",
+   "country": "Japan",
+   "flag": "🇯🇵",
+   "lat": 35.18,
+   "lon": 136.91,
+   "what": "The Asian Games in Aichi prefecture and Nagoya reached their twelfth day of competition, with 469 events across 43 sports running from 19 September to 4 October. Thursday's medals included a silver for India's Nitesh Siwach in the men's 97-kilogram Greco-Roman wrestling. China, Japan and South Korea lead the table, and twenty-six nations have won medals so far.",
+   "why": "Continental games are where athletes from smaller federations collect the results that decide whether they reach an Olympics at all, so a silver here can be the difference between funding and no funding for a whole national programme. They are also the largest multi-sport event most of these countries will host, which is why Japan spread the Games across a prefecture rather than one city. For much of Asia it is the only fortnight when minority sports get prime-time coverage.",
+   "stats": [
+    {
+     "v": "469",
+     "l": "events"
+    },
+    {
+     "v": "43",
+     "l": "sports"
+    },
+    {
+     "v": "26",
+     "l": "nations with medals"
+    }
+   ]
+  },
+  {
+   "id": "iceland-gender-gap",
+   "tone": "good",
+   "icon": "flagpost",
+   "weight": "light",
+   "title": "Iceland tops the gender gap index for a seventeenth year",
+   "place": "Reykjavik",
+   "country": "Iceland",
+   "flag": "🇮🇸",
+   "lat": 64.15,
+   "lon": -21.94,
+   "what": "Iceland ranked first in the world on the Global Gender Gap Index for the seventeenth consecutive year, having closed 93 percent of its measured gap. It remains the only country scoring above 90 percent. The index compares men and women on economic participation, educational attainment, health and political representation.",
+   "why": "The index measures the distance between men and women within a country rather than how rich it is, so a poor country can outrank a wealthy one and often does on individual measures. Iceland's lead rests heavily on political representation and on policies that are widely copied, in particular shared parental leave that is lost if fathers do not take it. Seventeen years at the top is also a reminder that the last stretch is the slowest: nobody has closed the final seven percent.",
+   "stats": [
+    {
+     "v": "93%",
+     "l": "of gap closed"
+    },
+    {
+     "v": "17",
+     "l": "years at number one"
+    }
+   ],
+   "jargon": {
+    "term": "Gender gap index",
+    "def": "An annual score comparing men and women within the same country on work, education, health and politics. It measures the gap, not the overall standard of living."
+   }
+  },
+  {
+   "id": "salzburg-film-museum",
+   "tone": "good",
+   "icon": "guitar",
+   "weight": "light",
+   "title": "Salzburg opens a museum to The Sound of Music",
+   "place": "Salzburg",
+   "country": "Austria",
+   "flag": "🇦🇹",
+   "lat": 47.81,
+   "lon": 13.05,
+   "what": "A museum devoted to The Sound of Music has opened at Hellbrunn Palace in Salzburg, with more than 450 costumes, props, recordings and documents from the 1965 film. The city has been a destination for visitors retracing the film's locations for six decades, and the collection gathers in one place material that had been scattered among private owners and studios.",
+   "why": "Salzburg has had a complicated relationship with the film for years: it draws a large share of the city's visitors while being far better known abroad than at home. Putting the material in a museum is partly a practical answer to that, concentrating the crowds in one place rather than in residential streets. It also preserves objects that tend to vanish, since film props are usually made to last a shoot rather than sixty years.",
+   "stats": [
+    {
+     "v": "450+",
+     "l": "items on show"
+    },
+    {
+     "v": "1965",
+     "l": "film released"
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "note": "Hand-written seed so the page renders before the first scheduled build; build_events.py overwrites this file."
+ }
+}

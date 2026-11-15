@@ -1,0 +1,46 @@
+name: Refresh Paper Planet
+
+on:
+  schedule:
+    - cron: "17 */3 * * *"      # every 3 hours (UTC); GitHub may delay a few minutes
+  workflow_dispatch:            # "Run workflow" button for a manual refresh
+  push:
+    branches: [main]            # redeploy the page itself when it changes
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Build the edition from GDELT
+        run: python scripts/build_events.py --out site/data/events.json --hours 3 --count 30
+      - name: Show what was picked
+        run: python -c "import json;d=json.load(open('site/data/events.json'));print(d['day'],d['meta']);[print(' ',e['flag'],e['tone'],e['icon'],'|',e['place'],'-',e['title']) for e in d['events']]"
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
