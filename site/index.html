@@ -7,138 +7,28 @@
 <title>Paper Planet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Karla:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap">
 
 <style>
-/* ============================================================
-   PAPER PLANET — tokens
-   Light is the hero: a cut-paper world on sea-glass water.
-   Dark is a night map: moss land, midnight water, glowing pins.
-   ============================================================ */
+/* Observatory design tokens. A consistent dark canvas keeps the map readable. */
 :root {
-  /* The ground is deliberately quiet — a dusty gouache sea and oat
-     land — so the only saturated things on the page are the figures. */
-  --ocean:        #6FC7DA;
-  --ocean-2:      #55B3CB;
-  --ocean-deep:   #3D97B7;
-  --shallow:      #B6E7F0;
-  --ocean-line:   rgba(38,48,52,.08);
-  --land:         #EEDFBB;
-  --land-2:       #E4D3AA;
-  --coast:        #BC9757;
-  --land-shadow:  rgba(58,50,34,.20);
-
-  /* paper + ink — the neutrals carry a little of the sea in them */
-  --paper:        #FCF8F1;
-  --paper-2:      #F1EADC;
-  --paper-edge:   #DDD3C1;
-  --ink:          #2F2D3A;
-  --ink-2:        #5D5B6A;
-  --ink-3:        #908E9C;
-
-  /* How the day is going for the people in it — impact, not approval.
-     base, deep shade for figure detail, ink for type, soft fill. */
-  --urgent:      #D9483B;
-  --urgent-dk:   #93291F;
-  --urgent-ink:  #8C271D;
-  --urgent-sf:   #F8E2DD;
-  --neutral:     #D9931A;
-  --neutral-dk:  #7E5104;
-  --neutral-ink: #744A04;
-  --neutral-sf:  #FBEFD6;
-  --good:        #17A06E;
-  --good-dk:     #0B5C3E;
-  --good-ink:    #0A5A3C;
-  --good-sf:     #DCF0E5;
-
-  --focus:        #2B2A3D;
-  --shadow-sm: 0 2px 0 var(--paper-edge);
-  --shadow-md: 0 4px 0 var(--paper-edge), 0 10px 24px rgba(23,45,52,.14);
-  --shadow-pop: 0 6px 0 var(--paper-edge), 0 18px 40px rgba(23,45,52,.22);
-
-  --r-sm: 10px; --r-md: 16px; --r-lg: 24px; --r-xl: 32px;
-
-  --font-display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
-  --font-body: "Karla", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
-
-  color-scheme: light;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --ocean:        #16465C;
-    --ocean-2:      #103449;
-    --ocean-deep:   #0B2637;
-    --shallow:      #2E7793;
-    --ocean-line:   rgba(255,255,255,.055);
-    --land:         #4F5D4A;
-    --land-2:       #45523F;
-    --coast:        #7C8E68;
-    --land-shadow:  rgba(0,0,0,.45);
-
-    --paper:        #1D2F38;
-    --paper-2:      #16262E;
-    --paper-edge:   #0D1C23;
-    --ink:          #ECF3F1;
-    --ink-2:        #A5BABE;
-    --ink-3:        #7B9096;
-
-    --urgent:      #FF7F6C;
-    --urgent-dk:   #A93A2A;
-    --urgent-ink:  #FFCFC6;
-    --urgent-sf:   #3B2A2A;
-    --neutral:     #F5BE55;
-    --neutral-dk:  #A06D15;
-    --neutral-ink: #FFE6B4;
-    --neutral-sf:  #38321F;
-    --good:        #4FD59B;
-    --good-dk:     #157254;
-    --good-ink:    #B9F0D9;
-    --good-sf:     #16352E;
-
-    --focus:        #FFE2B4;
-    --shadow-sm: 0 2px 0 var(--paper-edge);
-    --shadow-md: 0 4px 0 var(--paper-edge), 0 10px 24px rgba(0,0,0,.5);
-    --shadow-pop: 0 6px 0 var(--paper-edge), 0 18px 40px rgba(0,0,0,.6);
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --ocean:        #16465C;
-  --ocean-2:      #103449;
-  --ocean-deep:   #0B2637;
-  --shallow:      #2E7793;
-  --ocean-line:   rgba(255,255,255,.055);
-  --land:         #4F5D4A;
-  --land-2:       #45523F;
-  --coast:        #7C8E68;
-  --land-shadow:  rgba(0,0,0,.45);
-
-  --paper:        #1D2F38;
-  --paper-2:      #16262E;
-  --paper-edge:   #0D1C23;
-  --ink:          #ECF3F1;
-  --ink-2:        #A5BABE;
-  --ink-3:        #7B9096;
-
-  --urgent:      #FF7F6C;
-  --urgent-dk:   #A93A2A;
-  --urgent-ink:  #FFCFC6;
-  --urgent-sf:   #3B2A2A;
-  --neutral:     #F5BE55;
-  --neutral-dk:  #A06D15;
-  --neutral-ink: #FFE6B4;
-  --neutral-sf:  #38321F;
-  --good:        #4FD59B;
-  --good-dk:     #157254;
-  --good-ink:    #B9F0D9;
-  --good-sf:     #16352E;
-
-  --focus:        #FFE2B4;
-  --shadow-sm: 0 2px 0 var(--paper-edge);
-  --shadow-md: 0 4px 0 var(--paper-edge), 0 10px 24px rgba(0,0,0,.5);
-  --shadow-pop: 0 6px 0 var(--paper-edge), 0 18px 40px rgba(0,0,0,.6);
+  --ocean: #081824; --ocean-2: #07121e; --ocean-deep: #040c16;
+  --shallow: #174552; --ocean-line: rgba(110,207,222,.09);
+  --land: #12333e; --land-2: #153e49; --coast: #3b8592;
+  --land-shadow: rgba(0,0,0,.4);
+  --paper: #0d1c2b; --paper-2: #132738; --paper-edge: #284152;
+  --ink: #edf7fc; --ink-2: #afc3d2; --ink-3: #91aaba;
+  --urgent: #ff7f88; --urgent-dk: #a74055; --urgent-ink: #ffacb2; --urgent-sf: #38232f;
+  --neutral: #f4c779; --neutral-dk: #99723a; --neutral-ink: #f4d49f; --neutral-sf: #332e26;
+  --good: #6ae4bd; --good-dk: #287c6e; --good-ink: #9cecd4; --good-sf: #153731;
+  --focus: #80e5f7; --accent: #80e5f7;
+  --shadow-sm: 0 4px 16px #0003;
+  --shadow-md: 0 12px 32px #0005;
+  --shadow-pop: 0 24px 80px #0008;
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 22px;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
   color-scheme: dark;
 }
 
@@ -682,6 +572,7 @@ button { font: inherit; color: inherit; border: none; background: none; cursor: 
   background: var(--c-sf); border-radius: var(--r-sm); padding: 9px 12px; display: inline-block; }
 .src a:hover { text-decoration: underline; }
 </style>
+<link rel="stylesheet" href="observatory.css">
 </head>
 <body>
 <div id="stage">
@@ -689,6 +580,12 @@ button { font: inherit; color: inherit; border: none; background: none; cursor: 
   <div id="pins"></div>
 </div>
 
+<section class="map-heading" aria-label="About this edition">
+  <div class="eyebrow"><span class="signal-dot"></span> THE GLOBAL NEWS OBSERVATORY</div>
+  <h2>A world in motion.<br><span>Every story, connected.</span></h2>
+  <p>Explore the headlines shaping our planet.</p>
+</section>
+<div class="map-caption" aria-hidden="true"><span>◈ &nbsp; WORLD VIEW / EQUIRECTANGULAR</span><span>DRAG TO EXPLORE · SCROLL TO ZOOM</span></div>
 <div class="hud hud-top">
   <div class="brand">
     <svg class="brand-globe" viewBox="0 0 48 48" aria-hidden="true">
@@ -706,7 +603,7 @@ button { font: inherit; color: inherit; border: none; background: none; cursor: 
       <circle cx="24" cy="24" r="20" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
     </svg>
     <div>
-      <h1>Paper Planet</h1>
+      <h1>Paper<span>Planet</span><sup> / </sup></h1>
       <div class="date mono" id="date-line">—</div>
     </div>
   </div>
@@ -741,6 +638,7 @@ button { font: inherit; color: inherit; border: none; background: none; cursor: 
 
 <div class="filters" id="filters" role="group" aria-label="Filter stories by kind"></div>
 
+<div class="feed-label"><span class="eyebrow">THE LATEST DISPATCHES</span><span class="eyebrow" id="feed-count"></span></div>
 <div class="rail">
   <div class="rail-scroll" id="rail"></div>
   <button class="rail-btn" id="btn-random">
@@ -768,7 +666,8 @@ button { font: inherit; color: inherit; border: none; background: none; cursor: 
       </g>
       <circle cx="24" cy="24" r="20" fill="none" stroke="var(--ink)" stroke-width="2.5"/>
     </svg>
-    <h2>What happened today?</h2>
+    <div class="eyebrow">YOUR WINDOW TO THE WORLD</div>
+    <h2>The planet has a story.<br>Find your perspective.</h2>
     <div class="sub mono" id="intro-date">—</div>
     <p>Every figure is one real story from the last few hours, standing where it happened, with a link to the source. The map rebuilds itself every three hours from the GDELT news feed — no person or AI writes it.</p>
     <div class="legend">
@@ -777,7 +676,7 @@ button { font: inherit; color: inherit; border: none; background: none; cursor: 
       <span class="legend-item"><span class="dot" style="background:var(--good)"></span>Good news</span>
     </div>
     <p class="legend-note">Colour is about what the day is doing to the people in the story — not about taking sides.</p>
-    <button class="start" id="btn-start">Explore the day →</button>
+    <button class="start" id="btn-start">Enter the observatory <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 19L19 5M5 5h14v14"/></svg></button>
   </div>
 </div>
 
@@ -969,7 +868,7 @@ function drawMap() {
   const paths = Object.values(LAND).map(blobPath);
 
   /* shallow-water halos — three fading outlines, like a board game's depth rings */
-  [[22, .16], [14, .30], [7, .52]].forEach(([w, o]) => {
+  [[16, .06], [9, .12], [3, .24]].forEach(([w, o]) => {
     const halo = el("g", { fill: "none", stroke: "var(--shallow)", "stroke-width": w, opacity: o, "stroke-linejoin": "round" });
     paths.forEach(d => halo.appendChild(el("path", { d })));
     g.appendChild(halo);
@@ -981,7 +880,7 @@ function drawMap() {
   g.appendChild(sh);
 
   /* land */
-  const land = el("g", { fill: "var(--land)", stroke: "var(--coast)", "stroke-width": "3", "stroke-linejoin": "round" });
+  const land = el("g", { fill: "var(--land)", stroke: "var(--coast)", "stroke-width": "1.2", "stroke-linejoin": "round" });
   paths.forEach((d, i) => {
     const p = el("path", { d, class: "landmass" });
     p.style.opacity = "0";
@@ -1005,23 +904,6 @@ const kf = document.createElement("style");
 kf.textContent = "@keyframes land-in{from{opacity:0;transform:translateY(-14px) scale(.985);transform-origin:50% 50%}to{opacity:1;transform:none}}" +
   "@media (prefers-reduced-motion: reduce){.landmass{animation:none!important;opacity:1!important}}";
 document.head.appendChild(kf);
-
-/* ============================================================
-   5. CLOUDS
-   ============================================================ */
-if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  const sky = document.getElementById("stage");
-  [[8, 150, 62], [26, 96, 88], [55, 190, 74], [72, 120, 110]].forEach(([top, w, dur]) => {
-    const c = document.createElement("div");
-    c.className = "cloud";
-    c.style.top = top + "%";
-    c.style.width = w + "px";
-    c.style.animationDuration = dur + "s";
-    c.style.animationDelay = "-" + (Math.random() * dur) + "s";
-    c.innerHTML = '<svg viewBox="0 0 100 44" width="100%"><path fill="currentColor" d="M22,42C9,42 2,35 2,27S9,12 19,13C22,4 31,0 39,2s13,8 14,14c4-4 12-4 16,1s3,10 0,13c6-1 11,3 11,7s-4,5-8,5z"/></svg>';
-    sky.insertBefore(c, document.getElementById("pins"));
-  });
-}
 
 /* ============================================================
    6. STATE
@@ -1376,13 +1258,14 @@ function syncFilters() {
   });
 }
 
+document.getElementById("feed-count").textContent = EVENTS.length + " STORIES / " + new Set(EVENTS.map(e => e.country).filter(Boolean)).size + " COUNTRIES";
 const rail = document.getElementById("rail");
 EVENTS.forEach(ev => {
   const b = document.createElement("button");
   b.className = "rail-card" + (state.seen.has(ev.id) ? " seen" : "");
   b.dataset.tone = ev.tone;
   b.dataset.id = ev.id;
-  b.innerHTML = '<div class="place">' + ev.flag + ' ' + esc(ev.place) + '</div><div class="t">' + esc(ev.title) + '</div>';
+  b.innerHTML = '<div class="dispatch-number mono">' + String(EVENTS.indexOf(ev) + 1).padStart(2, '0') + '<span>' + esc(TONES[ev.tone].label) + '</span></div><div class="place">' + ev.flag + ' ' + esc(ev.place) + '</div><div class="t">' + esc(ev.title) + '</div>';
   b.onclick = () => open(ev.id);
   rail.appendChild(b);
 });

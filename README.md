@@ -70,3 +70,11 @@ older hand-written shape (`why`, `jargon`) still renders if you ever mix edition
 Map, figures and interaction: the original Paper Planet page. News data: GDELT Project
 (CC-BY-style terms, see gdeltproject.org). Headlines and summaries belong to their publishers
 and link back to them.
+
+## Interface
+
+The map uses a midnight observatory theme with cyan coastlines, a geographic grid,
+illustrated story markers, and numbered dispatch cards. Presentation overrides live
+in `site/observatory.css`; shared map and category tokens are in `site/index.html`.
+The interface adapts to mobile with a bottom story sheet and compact map controls,
+and respects the system's reduced-motion preference. No frontend build is needed.
