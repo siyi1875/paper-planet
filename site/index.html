@@ -2,33 +2,82 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Explore world news by where it happens. An interactive atlas of headlines from around the planet.">
+<meta name="description" content="Explore world news by where it happens. An interactive atlas of headlines from around the planet, refreshed every three hours.">
 <title>Paper Planet — The world, unfolding.</title>
-
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="atlas.css">
 <script src="vendor/d3.min.js" defer></script><script src="atlas.js" defer></script>
 </head>
 <body>
 <div id="atlas-app">
-<header class="masthead"><a href="./" class="wordmark" aria-label="Paper Planet home"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><ellipse cx="16" cy="16" rx="6" ry="13"/><path d="M3 16h26M6 8h20M6 24h20"/></svg>Paper Planet<span class="brand-period">.</span></a><span class="brand-note">An atlas of the world’s stories</span><button id="about-button" class="text-button">About the atlas <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></header>
+
+<header class="masthead">
+  <a href="./" class="wordmark" aria-label="Paper Planet home"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13"/><ellipse cx="16" cy="16" rx="6" ry="13"/><path d="M3 16h26M6 8h20M6 24h20"/></svg>Paper Planet<span class="brand-period">.</span></a>
+  <span class="live-pill" id="live-pill"><i class="live-dot" aria-hidden="true"></i><span id="live-text">Loading edition</span></span>
+  <div class="masthead-right">
+    <div class="explored" id="explored" title="Stories you've opened in this edition">
+      <svg viewBox="0 0 36 36" aria-hidden="true"><circle class="ring-track" cx="18" cy="18" r="15"/><circle class="ring-bar" id="ring-bar" cx="18" cy="18" r="15" pathLength="100" stroke-dasharray="0 100"/></svg>
+      <span><b id="explored-count">0 of 0</b><small>explored</small></span>
+    </div>
+    <button id="about-button" class="text-button">About <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button>
+  </div>
+</header>
+
 <main class="workspace">
 <section class="editorial" aria-label="News edition">
-<div id="edition-view"><div class="edition-meta"><span id="edition-date">Loading edition</span><span>WORLD EDITION</span></div><h1>The world,<br><em>unfolding.</em></h1><p class="intro-copy">Big stories. Different perspectives. <br>See where the news takes you.</p><div class="edition-note" id="edition-note"></div>
-<label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Find a place or a story" aria-label="Find a place or a story"><span aria-hidden="true">/</span></label>
-<div class="filters" role="group" aria-label="Filter by tone"><button data-filter="all" aria-pressed="true">All stories</button><button data-filter="urgent" aria-pressed="false">Urgent</button><button data-filter="neutral" aria-pressed="false">Neutral</button><button data-filter="good" aria-pressed="false">Good news</button></div>
-<div class="list-heading"><span id="result-count" aria-live="polite">Finding stories…</span><span>SELECT TO EXPLORE</span></div><div id="story-list"></div></div>
-<article id="story-view" hidden></article>
-<div class="editorial-footer"><span id="read-count">Your world, one story at a time.</span><button id="random-button" class="text-button">Surprise me <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></div>
+  <div id="edition-view">
+    <div class="front-top">
+      <div class="edition-meta"><span id="edition-date">Loading edition</span><span>WORLD EDITION</span></div>
+      <div class="mobile-live" id="mobile-live"></div>
+      <h1>The world, <em>unfolding.</em></h1>
+      <div class="toolbar">
+        <div class="filters" role="group" aria-label="Filter by tone">
+          <button data-filter="all" aria-pressed="true">All <span class="count" data-count="all"></span></button>
+          <button data-filter="urgent" aria-pressed="false"><i class="tone-dot urgent"></i>Urgent <span class="count" data-count="urgent"></span></button>
+          <button data-filter="neutral" aria-pressed="false"><i class="tone-dot neutral"></i>Neutral <span class="count" data-count="neutral"></span></button>
+          <button data-filter="good" aria-pressed="false"><i class="tone-dot good"></i>Good <span class="count" data-count="good"></span></button>
+        </div>
+        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Find a place or a story" aria-label="Find a place or a story"><span aria-hidden="true">/</span></label>
+      </div>
+    </div>
+    <div id="lead"></div>
+    <div id="front-rest"><div id="secondary"></div><div id="story-list"></div></div>
+  </div>
+  <article id="story-view" hidden></article>
+  <div class="editorial-footer"><span id="footer-note">Your world, one story at a time.</span><button id="random-button" class="text-button">Surprise me <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></div>
 </section>
+
 <section class="map-panel" aria-label="Interactive news atlas">
-<div class="map-top"><div class="map-title">Your perspective<span id="map-subtitle">Explore the world at your pace.</span></div><div class="view-switch" role="group" aria-label="Map projection"><button data-view="globe" aria-pressed="true">3D globe</button><button data-view="map" aria-pressed="false">World map</button></div></div>
-<div id="map-stage"><canvas id="earth-surface" aria-hidden="true"></canvas><svg id="world-map" aria-label="World map" role="img"></svg><div id="map-pins"></div><div class="map-loading" id="map-loading">Drawing the world…</div></div>
-<div class="orbit-controls"><button id="orbit-toggle" aria-pressed="true">Pause orbit</button><span id="orbit-state">Slow exploration</span><label class="speed-control">Rotation <span id="speed-value">2.0° / s</span><input id="orbit-speed" type="range" min="0.5" max="4" step="0.1" value="2" aria-label="Globe rotation speed"></label></div>
-<div class="globe-preview" id="globe-preview" hidden><button id="dismiss-preview" aria-label="Dismiss story preview">×</button><button id="open-preview"><span id="preview-place"></span><strong id="preview-title"></strong><span class="preview-action">Explore this story <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></span></button></div>
-<div class="map-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset-map" aria-label="Reset map view"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg></button></div>
-<div class="map-bottom"><div><span class="north-mark" aria-hidden="true">N ↑</span><span id="map-instruction">Drag to rotate · Scroll to zoom</span></div><div class="map-legend"><span><i class="urgent"></i>Urgent</span><span><i class="neutral"></i>Neutral</span><span><i class="good"></i>Good news</span></div></div>
-<div class="selected-location" id="selected-location" hidden></div>
-</section></main>
-<dialog id="about-dialog"><button id="close-about" class="close-button" aria-label="Close about">×</button><h2>A world worth understanding.</h2><p>Paper Planet puts news where it happens. Explore a location, open a headline, and follow the source to get the full story.</p><p>The edition rebuilds every three hours from GDELT events and publishers’ page metadata. Headlines and summaries are not written by AI. Tone labels are rule-based indications of impact, not political approval.</p><p class="credits">Geography: Natural Earth via world-atlas. Map projection: D3. News belongs to its publishers.</p></dialog>
-</div></body></html>
+  <div id="map-stage"><canvas id="earth-surface" aria-hidden="true"></canvas><img id="flat-earth" src="assets/earth.jpg" alt="" hidden draggable="false"><svg id="world-map" aria-label="World map" role="img"></svg><div id="map-labels" aria-hidden="true"></div><div id="map-pins"></div><div class="map-loading" id="map-loading">Drawing the world…</div></div>
+
+  <div class="control-panel">
+    <div class="panel-title">Your perspective<span id="map-subtitle">Explore the world at your pace.</span></div>
+    <div class="view-switch" role="group" aria-label="Map projection"><button data-view="globe" aria-pressed="true">3D globe</button><button data-view="map" aria-pressed="false">World map</button></div>
+    <button id="tour-toggle" class="tour-toggle" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="i-play" d="M8 5v14l11-7z"/><path class="i-pause" d="M8 5v14M16 5v14"/></svg><span id="tour-label">Play tour</span></button>
+    <label class="speed-control">Rotation <span id="speed-value">2.0° / s</span><input id="orbit-speed" type="range" min="0" max="4" step="0.5" value="2" aria-label="Globe rotation speed"></label>
+  </div>
+
+  <div class="tour-card" id="tour-card" hidden>
+    <div class="tour-progress"><i id="tour-bar"></i></div>
+    <button id="tour-open" class="tour-open">
+      <span class="tour-kicker" id="tour-kicker"></span>
+      <strong id="tour-title"></strong>
+      <span class="tour-summary" id="tour-summary"></span>
+    </button>
+    <div class="tour-actions"><span id="tour-step"></span><button id="tour-next" class="text-button">Next <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+  </div>
+
+  <div class="map-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="reset-map" aria-label="Reset map view"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 8M4 4v6h6"/></svg></button></div>
+  <div class="map-bottom">
+    <div class="hints" id="map-hints"><span><kbd>Drag</kbd>Orbit</span><span><kbd>Scroll</kbd>Zoom</span><span><kbd>Click</kbd>Open a story</span></div>
+    <div class="map-legend"><span><i class="urgent"></i>Urgent</span><span><i class="neutral"></i>Neutral</span><span><i class="good"></i>Good news</span></div>
+  </div>
+</section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<dialog id="about-dialog"><button id="close-about" class="close-button" aria-label="Close about">×</button><h2>A world worth understanding.</h2><p>Paper Planet puts news where it happens. Every figure on the globe is one story, standing where it happened. Open it for a short summary, a few numbers and a link to the source.</p><p>The edition rebuilds every three hours from GDELT events and publishers’ page metadata. Headlines and summaries are the publishers’ own; no AI writes them. Colour shows what the story means for the people in it — <b class="t-urgent">urgent</b> when people are harmed or in danger, <b class="t-good">good</b> when something measurably improved, <b class="t-neutral">neutral</b> for everything else — never approval.</p><p class="credits">Geography: Natural Earth via world-atlas. Map projection: D3. Earth texture: three.js examples (MIT). News belongs to its publishers.</p></dialog>
+</div>
+</body>
+</html>
