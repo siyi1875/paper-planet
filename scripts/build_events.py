@@ -32,6 +32,7 @@ import requests
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from geo_tables import continent_from_iso, flag_from_iso, iso_from_fips  # noqa: E402
+from place_names import COUNTRY, US_STATES  # noqa: E402
 
 GDELT_BASE = "http://data.gdeltproject.org/gdeltv2/"
 UA = "PaperPlanetBot/1.0 (+https://github.com/; automated news map; contact via repo)"
@@ -55,7 +56,7 @@ ICON_RULES = [
     ("blast",      r"\b(bomb\w*|blast|explosion\w*|explode\w*|detonat\w*|suicide attack|car bomb)\b"),
     ("missile",    r"\b(missile\w*|air ?strike\w*|airstrike\w*|rocket\w*|shelling|drone (attack|strike)\w*|bombard\w*|strikes? (on|hit|kill)\w*)\b"),
     ("ballot",     r"\b(election\w*|vote[sd]?|voters?|referendum|ballot\w*|polls? open|runoff|primary|turnout|seats|coalition talks|landslide (win|victory))\b"),
-    ("court",      r"\b(court|judge|trial|verdict|sentenc\w*|indict\w*|lawsuit|tribunal|ruling|convict\w*|acquit\w*|arrest\w*|extradit\w*|prosecut\w*|icc\b|icj\b)\b"),
+    ("court",      r"\b(court|judge|trial|verdict|sentenc\w*|indict\w*|lawsuit|tribunal|ruling|convict\w*|acquit\w*|arrest\w*|detain\w*|execution\w*|jail\w*|prison\w*|charged|extradit\w*|prosecut\w*|icc\b|icj\b)\b"),
     ("bank",       r"\b(central bank|interest rates?|rates? (hike|cut|rise|decision)|(cuts?|raises?|hikes?|holds?) (its )?(\w+ )?rates?|benchmark rate|policy rate|selic|repo rate|federal reserve|the fed\b|ecb\b|boj\b|inflation|monetary)\b"),
     ("chart",      r"\b(stocks?|shares|stock market|markets?|nasdaq|dow jones|s&p|wall street|gdp|earnings|ipo|rating agency|downgrade|upgrade|unemployment)\b"),
     ("oil",        r"\b(pipeline|drilling|refinery|refineries|oil ?field|opec)\b"),
@@ -63,24 +64,24 @@ ICON_RULES = [
     ("factory",    r"\b(factory|factories|manufactur\w*|industrial|steel|plant workers|output data|production (fell|rose))\b"),
     ("tanker",     r"\b(tankers?|shipping|container|cargo|freight|ports?\b|canal|strait)\b"),
     ("boat",       r"\b(ferry|ferries|vessel|boats?|capsiz\w*|sinks?|sank|coast ?guard|navy|naval)\b"),
-    ("plane",      r"\b(plane|airplane|aircraft|airliner|airlines?|flights?|airports?|jets?|aviation|helicopter)\b"),
+    ("plane",      r"\b(hotels?|touris\w*|plane|airplane|aircraft|airliner|airlines?|flights?|airports?|jets?|aviation|helicopter)\b"),
     ("medic",      r"\b(ebola|outbreak|virus|cholera|measles|malaria|vaccin\w*|hospitals?|disease|epidemic|pandemic|health (ministry|officials|agency)|world health|doctors?|clinic)\b"),
     ("footballer", r"\b(football|soccer|world cup|olympic\w*|league|championship\w*|tennis|cricket|rugby|athletics|marathon|nba|nfl|mlb|nhl|formula 1|grand prix|medal\w*|tournament|striker|goalkeeper|stadium|fifa|uefa)\b"),
-    ("guitar",     r"\b(music|concert|festival|album|film|movie|cinema|oscar\w*|museum|artist\w*|book|novel|singer|band|theatre|theater|exhibition|grammy\w*|archaeolog\w*|tomb|burial|ancient|fossil|heritage)\b"),
-    ("robot",      r"\b(ai\b|artificial intelligence|robots?|chips?|semiconductor\w*|openai|nvidia|tech giants?|cyber\w*|hack\w*|data cent\w*|software|app\b|smartphone)\b"),
+    ("guitar",     r"\b(music|concert|festival|album|film|movie|cinema|oscar\w*|museum|artist\w*|book|novel|singer|band|theatre|theater|exhibition|grammy\w*|archaeolog\w*|world war (i|ii|two)|veterans?|anniversar\w*|memorial|tomb|burial|ancient|fossil|heritage)\b"),
+    ("robot",      r"\b(satellites?|starlink|starshield|space ?x|spacecraft|ai\b|artificial intelligence|robots?|chips?|semiconductor\w*|openai|nvidia|tech giants?|cyber\w*|hack\w*|data cent\w*|software|app\b|smartphone)\b"),
     ("migrants",   r"\b(refugees?|migrants?|migration|asylum|displace\w*|flee\w*|fled|evacuat\w*|deport\w*|border crossing)\b"),
     ("protest",    r"\b(protest\w*|rally|rallies|march\w*|strikes?\b|demonstrat\w*|riots?|unrest|walkout|picket)\b"),
-    ("summit",     r"\b(summit|talks|negotiat\w*|meets|meeting|g20|g7|nato|un general assembly|delegation|ceasefire|peace (deal|plan|talks)|agreement|accord)\b"),
+    ("summit",     r"\b(summit|talks|negotiat\w*|g20|g7|asean|nato|un general assembly|ceasefire|peace (deal|plan|talks))\b"),
     ("alert",      r"\b(shooting|shot dead|stabbing|killed|crash\w*|accident|fire\b|wreck|poison\w*|stampede|drown\w*|missing|bod(y|ies) found|murder\w*|homicide|dead)\b"),
-    ("coin",       r"\b(currency|yen|dollar|euro|rupee|peso|yuan|budget|tax\w*|debt|bailout|subsid\w*|tariffs?|deficit|wages?|pension\w*)\b"),
-    ("flagpost",   r"\b(treaty|sovereignty|independence|annex\w*|territory|border|sanctions?|diplomatic|ambassador|alliance|parliament|government|minister|president|prime minister)\b"),
+    ("coin",       r"\b(parental leave|maternity|childcare|birth ?rate|benefits|currency|yen|dollar|euro|rupee|peso|yuan|budget|tax\w*|debt|bailout|subsid\w*|tariffs?|deficit|wages?|pension\w*)\b"),
+    ("flagpost",   r"\b(treaty|pact|accord|agreement|rapprochement|diplomac\w*|delegation|foreign minister|sovereignty|independence|annex\w*|territory|border|sanctions?|diplomatic|ambassador|alliance|parliament|government|minister|president|prime minister)\b"),
     ("speaker",    r"\b(says|said|announc\w*|statement|warns|urges|calls for|vows|pledges|declares|speech)\b"),
 ]
 ICON_RULES = [(name, re.compile(rx, re.I)) for name, rx in ICON_RULES]
 
 # CAMEO root code -> figure, used when no keyword matched.
 CAMEO_ICON = {
-    "01": "speaker", "02": "speaker", "03": "summit", "04": "summit", "05": "flagpost",
+    "01": "speaker", "02": "speaker", "03": "speaker", "04": "speaker", "05": "flagpost",
     "06": "coin", "07": "medic", "08": "flagpost", "09": "court", "10": "protest",
     "11": "protest", "12": "flagpost", "13": "alert", "14": "protest", "15": "missile",
     "16": "flagpost", "17": "court", "18": "blast", "19": "missile", "20": "rubble",
@@ -90,15 +91,17 @@ URGENT_KW = re.compile(
     r"\b(killed|kills?|dead|deaths?|dies|died|death toll|toll|injured|wounded|massacre|attacks?|"
     r"airstrikes?|air strikes?|bombing|explosion|blast|floods?|flooding|earthquake|wildfires?|hurricane|"
     r"typhoon|cyclone|collapse[sd]?|crash\w*|outbreak|famine|starv\w*|displaced|flee\w*|fled|"
-    r"evacuat\w*|missing|shooting|stabbing|hostages?|kidnapp\w*|war\b|fighting|clashes|siege|"
+    r"evacuat\w*|missing|shooting|stabbing|hostages?|kidnapp\w*|war\b|fighting|clash\w*|violent|siege|"
     r"blockade|emergency|crisis|recession|layoffs|poison\w*|drown\w*|stampede|wreck|sinks|sank|"
     r"capsized|erupt\w*|landslide|tsunami|execut\w*|torture|abuse|shortage|murder\w*|homicide|bod(y|ies) found)\b", re.I)
+GOOD_WEAK = re.compile(r"\b(historic|first[- ]ever|opens|hope|safe|protect\w*|expands?|boost\w*|milestone|celebrat\w*)\b", re.I)
 FIGURATIVE = re.compile(r"\b(trade|drug|price|culture|bidding|word|tariff) wars?\b|\bwar of words\b", re.I)
 GOOD_KW = re.compile(
     r"\b(rescued|saved|survive[sd]?|recover\w*|wins?|won|victory|champions?|breakthrough|cure|"
     r"approved|ceasefire holds|peace deal|peace agreement|released|freed|reunited|celebrat\w*|"
     r"awards?|nobel|discover\w*|milestone|first[- ]ever|historic|record low unemployment|"
-    r"growth beats|surplus|reopens?|restored|cleared|safe|hope|donat\w*|free (school|health))\b", re.I)
+    r"growth beats|surplus|reopens?|opens|inaugurat\w*|restored|cleared|safe|hope|donat\w*|free (school|health)|"
+    r"benefits?|boost\w*|expands?|improv\w*|record (high|harvest)|lowest|eradicat\w*|protect\w*|conserv\w*|clean energy|solar|wins? (bid|approval))\b", re.I)
 HEAVY_KW = re.compile(
     r"\b(killed|kills?|dead|deaths?|dies|died|death toll|massacre|airstrikes?|bombing|explosion|"
     r"floods?|flooding|earthquake|wildfires?|hurricane|typhoon|cyclone|collapse[sd]?|crash\w*|"
@@ -108,7 +111,9 @@ HEAVY_KW = re.compile(
 BAD_TITLE = re.compile(
     r"(access denied|just a moment|attention required|403 forbidden|404|page not found|"
     r"are you a robot|captcha|subscribe to|sign in|log in|enable javascript|cloudflare|"
-    r"^untitled$|^home$|^news$|^error)", re.I)
+    r"^untitled$|^home$|^news$|^error|transcript|live updates|live blog|^live:|^watch:|^listen:|podcast|newsletter|"
+    r"quiz|crossword|horoscope|obituar|^opinion|^letters?\b|^from the archives|"
+    r"\bvs\.? .+ on \d{1,2} \w+,? \d{4}$)", re.I)
 
 # Sites whose pages are paywalled or bot-walled so often that it is cheaper to skip them.
 SKIP_DOMAINS = {"facebook.com", "twitter.com", "x.com", "youtube.com", "instagram.com",
@@ -118,6 +123,7 @@ SKIP_DOMAINS = {"facebook.com", "twitter.com", "x.com", "youtube.com", "instagra
 # Very large "regional" sources that otherwise crowd out the rest of the world.
 COUNTRY_CAP_DEFAULT = 3
 COUNTRY_CAP = {"US": 4}
+GOOD_MIN = 3
 CONTINENT_MIN = {"africa": 2, "asia": 2, "europe": 2, "north_america": 2,
                  "south_america": 2, "oceania": 2}
 
@@ -192,7 +198,7 @@ def collect_candidates(rows: list[list[str]]) -> list[dict]:
         iso = iso_from_fips(p[C["GEOCOUNTRY"]])
         cand = by_url.setdefault(url, {
             "url": url, "domain": domain, "geos": defaultdict(int), "roots": defaultdict(int),
-            "gold": [], "tone": [], "quad": [], "mentions": 0, "sources": 0, "articles": 0,
+            "gold": [], "tone": [], "quad": [], "mentions": 0, "sources": 0, "articles": 0, "peak": 0,
             "actors": set(), "isroot": 0,
         })
         key = (p[C["GEONAME"]], iso, p[C["GEOCOUNTRY"]], round(lat, 2), round(lon, 2), geotype)
@@ -201,6 +207,7 @@ def collect_candidates(rows: list[list[str]]) -> list[dict]:
         cand["roots"][p[C["EVENTROOT"]]] += mentions
         cand["gold"].append(gold); cand["tone"].append(tone); cand["quad"].append(quad)
         cand["mentions"] += mentions; cand["sources"] = max(cand["sources"], sources)
+        cand["peak"] = max(cand["peak"], mentions)
         cand["articles"] = max(cand["articles"], articles)
         cand["isroot"] += int(p[C["ISROOT"]] or 0)
         for a in (p[C["ACTOR1NAME"]], p[C["ACTOR2NAME"]]):
@@ -225,12 +232,56 @@ def collect_candidates(rows: list[list[str]]) -> list[dict]:
             "tone_avg": sum(cand["tone"]) / len(cand["tone"]),
             "quad_max": max(cand["quad"]),
             "continent": continent_from_iso(iso),
-            # coverage score: how many outlets are talking about it, how prominently
-            "score": cand["mentions"] * (1 + 0.25 * cand["sources"]) * (1.5 if cand["isroot"] else 1),
         })
         out.append(cand)
+    merge_syndicated(out)
+    for cand in out:
+        # Coverage score. The story's single most-mentioned event measures how widely it is
+        # covered; summing every event in a long article rewarded length, not importance.
+        # A small share of the total keeps rich articles slightly ahead on ties.
+        weight = cand["peak"] + 0.1 * cand["mentions"]
+        cand["score"] = weight * (1 + 0.25 * cand["sources"]) * (1.5 if cand["isroot"] else 1)
     out.sort(key=lambda c: c["score"], reverse=True)
-    return out
+    return [c for c in out if not c.get("copy_of")]
+
+
+# The same article republished across a newspaper chain (one wire story on 8 regional
+# mastheads) shows up as 8 URLs that share a story id or slug. GDELT counts each copy as
+# a separate source, so the story looks far more widely covered than it is.
+STORY_ID = re.compile(r"/(\d{6,})(?:/|$|-)")
+
+
+def story_key(url: str) -> str | None:
+    path = urlparse(url).path.rstrip("/")
+    m = STORY_ID.search(path)
+    if m:
+        return "id:" + m.group(1)
+    slug_part = path.rsplit("/", 1)[-1].split(".")[0].lower()
+    if slug_part.count("-") >= 4:
+        return "slug:" + slug_part
+    return None
+
+
+def merge_syndicated(cands: list[dict]) -> None:
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for c in cands:
+        k = story_key(c["url"])
+        if k:
+            groups[k].append(c)
+    for copies in groups.values():
+        domains = {c["domain"] for c in copies}
+        if len(domains) < 2:
+            continue
+        keep = max(copies, key=lambda c: (c["peak"], c["mentions"]))
+        n = len(domains)
+        keep["syndicated"] = n
+        # Copies of one article are one source, not n.
+        keep["sources"] = max(1, keep["sources"] - (n - 1))
+        keep["peak"] = keep["peak"] / n
+        keep["mentions"] = round(keep["mentions"] / n)
+        for c in copies:
+            if c is not keep:
+                c["copy_of"] = keep["url"]
 
 
 # ---------------------------------------------------------------------------
@@ -307,6 +358,7 @@ def fetch_page_meta(url: str, domain: str, session: requests.Session) -> dict | 
         m = TITLE_RX.search(page)
         title = m.group(1) if m else ""
     title = strip_site_suffix(clean_text(title, 200), domain)
+    title = re.sub(r"^(news|breaking|update|exclusive|video|photos?)\s*[:|-]\s*", "", title, flags=re.I)
     if len(title) < 18 or BAD_TITLE.search(title):
         return None
     locale = (meta.get("og:locale") or "en").lower()
@@ -323,13 +375,97 @@ def fetch_page_meta(url: str, domain: str, session: requests.Session) -> dict | 
 
 
 # ---------------------------------------------------------------------------
+# 3b. Where is the story? GDELT geocodes the *event* it extracted, which is
+#     often a side detail (a Yemeni port in a story about Iran). If the headline
+#     names a country and never mentions GDELT's country, trust the headline.
+# ---------------------------------------------------------------------------
+EXTRA_ALIASES = {
+    "US": ["U.S.", "US", "USA", "America", "American", "Americans", "White House", "Pentagon", "Washington DC"],
+    "GB": ["UK", "U.K.", "Britain", "British", "England", "English", "Scotland", "Scottish", "Wales", "Welsh", "London"],
+    "AU": ["Aussie", "Aussies", "Australian", "Australians"], "NZ": ["Kiwi", "Kiwis", "New Zealander"],
+    "CN": ["Chinese", "Beijing", "Shanghai", "Hong Kong"], "TW": ["Taiwanese"], "JP": ["Japanese", "Tokyo"],
+    "KR": ["Korean", "Seoul"], "KP": ["North Korean", "Pyongyang"], "IN": ["Indian", "New Delhi", "Delhi", "Mumbai"],
+    "PK": ["Pakistani", "Islamabad", "Karachi", "Lahore"], "AF": ["Afghan", "Kabul"],
+    "IR": ["Iranian", "Iranians", "Tehran"], "IQ": ["Iraqi", "Baghdad"], "SY": ["Syrian", "Damascus"],
+    "IL": ["Israeli", "Israelis", "Tel Aviv"], "PS": ["Palestinian", "Palestinians", "Gaza", "West Bank"],
+    "LB": ["Lebanese", "Beirut"], "YE": ["Yemeni", "Sanaa"],
+    "SA": ["Saudi", "Saudis", "Riyadh"], "AE": ["UAE", "Emirati", "Dubai", "Abu Dhabi"], "QA": ["Qatari", "Doha"],
+    "TR": ["Turkish", "Türkiye", "Ankara", "Istanbul"], "EG": ["Egyptian", "Cairo"], "RU": ["Russian", "Russians", "Kremlin", "Moscow"],
+    "UA": ["Ukrainian", "Ukrainians", "Kyiv"], "BY": ["Belarusian", "Minsk"],
+    "DE": ["German", "Germans", "Berlin"], "FR": ["French", "Paris"], "IT": ["Italian", "Rome"],
+    "ES": ["Spanish", "Madrid"], "PL": ["Polish", "Warsaw"], "NL": ["Dutch", "Amsterdam"], "EE": ["Estonian", "Tallinn"],
+    "CA": ["Canadian", "Canadians", "Ottawa", "Toronto", "Quebec"], "MX": ["Mexican", "Mexico City"],
+    "BR": ["Brazilian", "Brasilia"], "AR": ["Argentine", "Argentinian", "Buenos Aires"], "VE": ["Venezuelan", "Caracas"],
+    "CO": ["Colombian", "Bogota"], "CL": ["Chilean", "Santiago"], "PE": ["Peruvian", "Lima"],
+    "NG": ["Nigerian", "Abuja", "Lagos"], "KE": ["Kenyan", "Nairobi"], "ZA": ["South African", "Johannesburg", "Cape Town"],
+    "ET": ["Ethiopian", "Addis Ababa"], "SD": ["Sudanese", "Khartoum"], "SS": ["South Sudanese"], "SO": ["Somali", "Mogadishu"],
+    "CD": ["DR Congo", "DRC", "Congolese", "Kinshasa"], "UG": ["Ugandan", "Kampala"], "GH": ["Ghanaian", "Accra"],
+    "MA": ["Moroccan", "Rabat"], "PH": ["Filipino", "Philippine", "Manila"], "ID": ["Indonesian", "Jakarta"],
+    "VN": ["Vietnamese", "Hanoi"], "TH": ["Thai", "Bangkok"], "MM": ["Myanmar", "Burmese"], "BD": ["Bangladeshi", "Dhaka"],
+}
+# Names that are also common words or people: never used on their own.
+AMBIGUOUS = {"Georgia", "Jordan", "Chad", "Victoria", "Kingston", "Georgetown", "Washington", "Santiago"}
+
+
+def _build_place_index():
+    alias = {}
+    for iso, (name, capital, lat, lon) in COUNTRY.items():
+        for a in [name] + ([capital] if len(capital) > 4 else []) + EXTRA_ALIASES.get(iso, []):
+            if a not in AMBIGUOUS:
+                alias.setdefault(a, (iso, None))
+    for state in US_STATES:
+        if state not in AMBIGUOUS:
+            alias.setdefault(state, ("US", state))
+    alias["Republic of Georgia"] = ("GE", None)
+    # longest names first so "South Sudan" wins over "Sudan", "Papua New Guinea" over "Guinea"
+    names = sorted(alias, key=len, reverse=True)
+    rx = re.compile(r"(?<![\w.])(" + "|".join(re.escape(n) for n in names) + r")(?![\w])")
+    return alias, rx
+
+
+PLACE_ALIAS, PLACE_RX = _build_place_index()
+
+
+def place_mentions(text: str) -> list[tuple[str, str | None, int]]:
+    """(iso, us_state, position) for every country/state named in text, case-sensitive."""
+    return [(*PLACE_ALIAS[m.group(1)], m.start()) for m in PLACE_RX.finditer(text)]
+
+
+def locate_from_text(title: str, summary: str, iso: str, place: str = "") -> dict | None:
+    """Return a new location if the text clearly points somewhere other than GDELT's geocode."""
+    if place and len(place) > 3 and place.lower() in f"{title} {summary}".lower():
+        return None  # GDELT's own town is named in the story: trust it
+    t_hits, s_hits = place_mentions(title), place_mentions(summary)
+    if not t_hits and not s_hits:
+        return None
+    score = defaultdict(int)
+    first = {}
+    for h in t_hits:
+        score[h[0]] += 3; first.setdefault(h[0], h[2])
+    for h in s_hits:
+        score[h[0]] += 1; first.setdefault(h[0], 1000 + h[2])
+    best = max(score, key=lambda k: (score[k], -first[k]))
+    # Only move a story to a country its headline names, and only if that country
+    # outweighs GDELT's own (people and groups are deliberately not aliases: they travel).
+    if first[best] >= 1000 or best not in COUNTRY or score.get(iso, 0) >= score[best]:
+        return None
+    state = next((h[1] for h in t_hits + s_hits if h[0] == best and h[1]), None)
+    name, capital, lat, lon = COUNTRY[best]
+    if state:
+        lat, lon = US_STATES[state]
+        return {"iso": best, "place": state, "country": name, "lat": lat, "lon": lon}
+    return {"iso": best, "place": capital, "country": name, "lat": lat, "lon": lon}
+
+
+# ---------------------------------------------------------------------------
 # 4. Rules for tone / figure / weight
 # ---------------------------------------------------------------------------
 def classify(cand: dict, title: str, summary: str) -> tuple[str, str, str]:
     title = FIGURATIVE.sub(" ", title); summary = FIGURATIVE.sub(" ", summary)
     text = f"{title}. {summary}"
-    urgent = len(URGENT_KW.findall(title)) * 2 + len(URGENT_KW.findall(summary))
-    good = len(GOOD_KW.findall(title)) * 2 + len(GOOD_KW.findall(summary))
+    urgent_text = len(URGENT_KW.findall(title)) * 2 + len(URGENT_KW.findall(summary))
+    good_text = len(GOOD_KW.findall(title)) * 2 + len(GOOD_KW.findall(summary))
+    urgent, good = urgent_text, good_text
     if cand["quad_max"] == 4:
         urgent += 2
     if cand["gold_avg"] <= -5:
@@ -340,18 +476,20 @@ def classify(cand: dict, title: str, summary: str) -> tuple[str, str, str]:
         good += 1
     if cand["tone_avg"] <= -4:
         urgent += 1
-    if urgent >= 2 and urgent > good:
+    # GDELT's event codes and tone scores can push a story either way, but only
+    # the words of the headline and summary can make it urgent or good.
+    if urgent_text and urgent >= 2 and urgent > good:
         tone = "urgent"
-    elif good >= 3 and good > urgent:
+    elif good_text and not title.rstrip().endswith("?") and ((good >= 3 and good > urgent and len(GOOD_KW.findall(title)) > len(GOOD_WEAK.findall(title)))
+                        or (urgent_text == 0 and len(GOOD_KW.findall(title)) > len(GOOD_WEAK.findall(title)))):
         tone = "good"
     else:
         tone = "neutral"
 
-    icon = None
-    for name, rx in ICON_RULES:
-        if rx.search(title) or (name in ("flood", "wildfire", "rubble", "medic") and rx.search(summary)):
-            icon = name
-            break
+    # Headline first; then the summary, skipping the catch-all "says/said" figure.
+    icon = next((name for name, rx in ICON_RULES if rx.search(title)), None)
+    if icon is None:
+        icon = next((name for name, rx in ICON_RULES if name != "speaker" and rx.search(summary)), None)
     if icon is None:
         icon = CAMEO_ICON.get(cand["root"], "globe")
     if tone == "good" and icon in ("blast", "missile", "rubble"):
@@ -402,6 +540,12 @@ def select_spread(stories: list[dict], count: int) -> list[dict]:
                 break
             if st["continent"] == cont and st not in chosen and ok(st):
                 take(st)
+    # Reserve a few places for good news so the green filter is never empty.
+    for st in stories:
+        if sum(1 for c in chosen if c["tone"] == "good") >= GOOD_MIN:
+            break
+        if st["tone"] == "good" and st not in chosen and ok(st):
+            take(st)
     # Second pass: fill by coverage score.
     for st in stories:
         if len(chosen) >= count:
@@ -451,6 +595,11 @@ def build(hours: float, count: int, pool: int, workers: int) -> dict:
             meta = fut.result()
             if not meta:
                 continue
+            moved = locate_from_text(meta["title"], meta["summary"], c["iso"], c["place"])
+            if not moved and c["geotype"] == 1 and c["iso"] not in {h[0] for h in place_mentions(meta["title"] + " " + meta["summary"])}:
+                continue  # only a country-wide geocode, and the story never names that country
+            if moved:
+                c = {**c, **moved, "continent": continent_from_iso(moved["iso"]), "moved": True}
             tone, icon, weight = classify(c, meta["title"], meta["summary"])
             st = {
                 "id": slug(meta["title"]),

@@ -1,0 +1,35 @@
+name: Preview edition (no deploy)
+
+# Builds an edition from live GDELT on pull requests that touch the pipeline, so rule
+# changes can be checked on real news before merging. Never publishes to Pages.
+on:
+  pull_request:
+    paths: ["scripts/**", "tests/**", ".github/workflows/preview-edition.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - name: Tests
+        run: |
+          python tests/test_offline.py
+          python tests/test_syndication.py
+          python tests/test_replay.py
+      - name: Build an edition from live GDELT
+        run: mkdir -p preview && python scripts/build_events.py --out preview/events.json --hours 3 --count 30
+      - name: Show what was picked
+        run: python -c "import json;d=json.load(open('preview/events.json'));print(d['meta']);[print(f\"{e['score']:>8} {e['tone']:<7} {e['icon']:<10} {e['place']}, {e['country']} | {e['title']}\") for e in d['events']]"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: preview-edition
+          path: preview/events.json

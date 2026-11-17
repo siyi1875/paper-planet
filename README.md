@@ -41,8 +41,10 @@ Until the first run finishes, the page shows the seed edition shipped in
 | Candidates | Keeps events with a real location and groups them by source article. Score = how many times and by how many outlets the article was mentioned. |
 | Spread | Guarantees at least two stories from each of Africa, Asia, Europe, North America, South America and Oceania, caps any one country (3; the US 4), then fills by score. |
 | Headlines | Fetches each candidate page and reads its `og:title` / `og:description`. Paywalled, bot-walled, non-English or junk titles are dropped. |
-| Tone | *Urgent* when the event is coded as material conflict or its text carries words like killed, flood, outbreak. *Good* only when several positive signals line up (rescued, wins, breakthrough, strongly positive tone). Everything else, including every politically contested story, is *neutral*. |
-| Figure | Keyword rules on the headline (flood → house in water, election → ballot box …), falling back to the event's CAMEO category. |
+| Tone | *Urgent* needs words like killed, flood, outbreak in the headline or summary; GDELT's conflict coding can strengthen it but never decides it alone. *Good* needs a clear positive word in the headline (rescued, wins, breakthrough, benefits…), not a soft one (historic, opens). Everything else, including every politically contested story, is *neutral*. Up to 3 good stories are kept in each edition so the green filter isn't empty. |
+| Place | GDELT geocodes the event it extracted, which can be a side detail. If the headline names a different country (or US state) and GDELT's own town isn't mentioned, the story moves to that country's capital (or the state's largest city). |
+| Figure | Keyword rules on the headline, then the summary (flood → house in water, election → ballot box …), falling back to the event's CAMEO category. *Summit* is kept for real summits and talks. |
+| Junk | Transcripts, live blogs, podcasts, quizzes and opinion pages are skipped. |
 | Weight | Heavy (no bobbing) for deaths and disasters, light for good news, normal otherwise. |
 | Safety | If fewer than 12 usable stories come back, the job fails and the previous edition stays online. |
 
