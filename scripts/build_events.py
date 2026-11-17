@@ -197,7 +197,7 @@ def collect_candidates(rows: list[list[str]]) -> list[dict]:
         iso = iso_from_fips(p[C["GEOCOUNTRY"]])
         cand = by_url.setdefault(url, {
             "url": url, "domain": domain, "geos": defaultdict(int), "roots": defaultdict(int),
-            "gold": [], "tone": [], "quad": [], "mentions": 0, "sources": 0, "articles": 0,
+            "gold": [], "tone": [], "quad": [], "mentions": 0, "sources": 0, "articles": 0, "peak": 0,
             "actors": set(), "isroot": 0,
         })
         key = (p[C["GEONAME"]], iso, p[C["GEOCOUNTRY"]], round(lat, 2), round(lon, 2), geotype)
@@ -206,6 +206,7 @@ def collect_candidates(rows: list[list[str]]) -> list[dict]:
         cand["roots"][p[C["EVENTROOT"]]] += mentions
         cand["gold"].append(gold); cand["tone"].append(tone); cand["quad"].append(quad)
         cand["mentions"] += mentions; cand["sources"] = max(cand["sources"], sources)
+        cand["peak"] = max(cand["peak"], mentions)
         cand["articles"] = max(cand["articles"], articles)
         cand["isroot"] += int(p[C["ISROOT"]] or 0)
         for a in (p[C["ACTOR1NAME"]], p[C["ACTOR2NAME"]]):
@@ -230,12 +231,56 @@ def collect_candidates(rows: list[list[str]]) -> list[dict]:
             "tone_avg": sum(cand["tone"]) / len(cand["tone"]),
             "quad_max": max(cand["quad"]),
             "continent": continent_from_iso(iso),
-            # coverage score: how many outlets are talking about it, how prominently
-            "score": cand["mentions"] * (1 + 0.25 * cand["sources"]) * (1.5 if cand["isroot"] else 1),
         })
         out.append(cand)
+    merge_syndicated(out)
+    for cand in out:
+        # Coverage score. The story's single most-mentioned event measures how widely it is
+        # covered; summing every event in a long article rewarded length, not importance.
+        # A small share of the total keeps rich articles slightly ahead on ties.
+        weight = cand["peak"] + 0.1 * cand["mentions"]
+        cand["score"] = weight * (1 + 0.25 * cand["sources"]) * (1.5 if cand["isroot"] else 1)
     out.sort(key=lambda c: c["score"], reverse=True)
-    return out
+    return [c for c in out if not c.get("copy_of")]
+
+
+# The same article republished across a newspaper chain (one wire story on 8 regional
+# mastheads) shows up as 8 URLs that share a story id or slug. GDELT counts each copy as
+# a separate source, so the story looks far more widely covered than it is.
+STORY_ID = re.compile(r"/(\d{6,})(?:/|$|-)")
+
+
+def story_key(url: str) -> str | None:
+    path = urlparse(url).path.rstrip("/")
+    m = STORY_ID.search(path)
+    if m:
+        return "id:" + m.group(1)
+    slug_part = path.rsplit("/", 1)[-1].split(".")[0].lower()
+    if slug_part.count("-") >= 4:
+        return "slug:" + slug_part
+    return None
+
+
+def merge_syndicated(cands: list[dict]) -> None:
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for c in cands:
+        k = story_key(c["url"])
+        if k:
+            groups[k].append(c)
+    for copies in groups.values():
+        domains = {c["domain"] for c in copies}
+        if len(domains) < 2:
+            continue
+        keep = max(copies, key=lambda c: (c["peak"], c["mentions"]))
+        n = len(domains)
+        keep["syndicated"] = n
+        # Copies of one article are one source, not n.
+        keep["sources"] = max(1, keep["sources"] - (n - 1))
+        keep["peak"] = keep["peak"] / n
+        keep["mentions"] = round(keep["mentions"] / n)
+        for c in copies:
+            if c is not keep:
+                c["copy_of"] = keep["url"]
 
 
 # ---------------------------------------------------------------------------
