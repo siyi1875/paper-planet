@@ -70,3 +70,27 @@ older hand-written shape (`why`, `jargon`) still renders if you ever mix edition
 Map, figures and interaction: the original Paper Planet page. News data: GDELT Project
 (CC-BY-style terms, see gdeltproject.org). Headlines and summaries belong to their publishers
 and link back to them.
+
+## Interface
+
+Paper Planet pairs a searchable edition with a rotatable globe. Select a headline
+or map marker to read its summary and center its location. Switch to the flat map
+to see every location. Tone filters and search apply to both the map and list.
+
+The static frontend is `site/index.html`, `site/atlas.css`, and `site/atlas.js`.
+D3, country geometry, the Earth texture, and fonts are bundled locally; there is no frontend build.
+Globe navigation respects reduced motion. On small screens the globe sits above
+the edition, and selecting a story scrolls to its reading view.
+
+Geography comes from Natural Earth via world-atlas. D3 and font licenses are
+included in `site/vendor`, `site/fonts`, and `site/assets`.
+
+The globe slowly rotates while idle. Near-center news locations briefly reveal
+clickable previews; highlights last 2.2 seconds while the globe keeps rotating. Hovering or focusing a preview holds its text in place without stopping the globe. Use Pause
+orbit to stop discovery. Reading a story, dragging, searching, the flat map, and
+reduced-motion preferences suspend rotation. The floating controls adjust rotation speed and switch to a static full-world map. Occasional soft lens-flare streaks highlight
+locations without affecting read progress.
+
+The globe uses a small native WebGL renderer for texture and atmospheric lighting,
+with the vector atlas as a fallback when WebGL is unavailable. The pale studio
+composition and lighting references are documented in `DESIGN.md`.
