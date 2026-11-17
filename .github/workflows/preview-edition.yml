@@ -26,7 +26,7 @@ jobs:
           python tests/test_syndication.py
           python tests/test_replay.py
       - name: Build an edition from live GDELT
-        run: python scripts/build_events.py --out preview/events.json --hours 3 --count 30
+        run: mkdir -p preview && python scripts/build_events.py --out preview/events.json --hours 3 --count 30
       - name: Show what was picked
         run: python -c "import json;d=json.load(open('preview/events.json'));print(d['meta']);[print(f\"{e['score']:>8} {e['tone']:<7} {e['icon']:<10} {e['place']}, {e['country']} | {e['title']}\") for e in d['events']]"
       - uses: actions/upload-artifact@v4
