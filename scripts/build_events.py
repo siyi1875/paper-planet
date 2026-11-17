@@ -112,7 +112,8 @@ BAD_TITLE = re.compile(
     r"(access denied|just a moment|attention required|403 forbidden|404|page not found|"
     r"are you a robot|captcha|subscribe to|sign in|log in|enable javascript|cloudflare|"
     r"^untitled$|^home$|^news$|^error|transcript|live updates|live blog|^live:|^watch:|^listen:|podcast|newsletter|"
-    r"quiz|crossword|horoscope|obituar|^opinion|^letters?\b)", re.I)
+    r"quiz|crossword|horoscope|obituar|^opinion|^letters?\b|^from the archives|"
+    r"\bvs\.? .+ on \d{1,2} \w+,? \d{4}$)", re.I)
 
 # Sites whose pages are paywalled or bot-walled so often that it is cheaper to skip them.
 SKIP_DOMAINS = {"facebook.com", "twitter.com", "x.com", "youtube.com", "instagram.com",
@@ -479,7 +480,7 @@ def classify(cand: dict, title: str, summary: str) -> tuple[str, str, str]:
     # the words of the headline and summary can make it urgent or good.
     if urgent_text and urgent >= 2 and urgent > good:
         tone = "urgent"
-    elif good_text and ((good >= 3 and good > urgent and len(GOOD_KW.findall(title)) > len(GOOD_WEAK.findall(title)))
+    elif good_text and not title.rstrip().endswith("?") and ((good >= 3 and good > urgent and len(GOOD_KW.findall(title)) > len(GOOD_WEAK.findall(title)))
                         or (urgent_text == 0 and len(GOOD_KW.findall(title)) > len(GOOD_WEAK.findall(title)))):
         tone = "good"
     else:
@@ -595,6 +596,8 @@ def build(hours: float, count: int, pool: int, workers: int) -> dict:
             if not meta:
                 continue
             moved = locate_from_text(meta["title"], meta["summary"], c["iso"], c["place"])
+            if not moved and c["geotype"] == 1 and c["iso"] not in {h[0] for h in place_mentions(meta["title"] + " " + meta["summary"])}:
+                continue  # only a country-wide geocode, and the story never names that country
             if moved:
                 c = {**c, **moved, "continent": continent_from_iso(moved["iso"]), "moved": True}
             tone, icon, weight = classify(c, meta["title"], meta["summary"])
