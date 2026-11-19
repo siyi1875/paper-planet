@@ -57,12 +57,19 @@ const logMax = Math.log(1 + Math.max(...events.map(e => e.score), 1));
 const mixed = e => Math.log(1 + e.score) / logMax * Math.pow(mixWeight(e), 1.6);
 const isSeed = /seed/i.test(data.day.label || '') || /seed/.test(data.day.edition || '');
 
-// The reader's mix: one weight per topic, 0-100. Equal weights = the plain front page.
-const MIX_DEFAULT = 50;
-let mix = Object.fromEntries(Object.keys(TOPICS).map(k => [k, MIX_DEFAULT]));
-try { const saved = JSON.parse(localStorage.getItem('pp-mix') || 'null'); if (saved) Object.keys(mix).forEach(k => { if (Number.isFinite(saved[k])) mix[k] = Math.max(0, Math.min(100, saved[k])); }); } catch (e) {}
-const balanced = () => Object.values(mix).every(v => v === Object.values(mix)[0]);
-const mixWeight = e => { const vals = Object.values(mix), avg = vals.reduce((a, b) => a + b, 0) / vals.length || 1; return (mix[e.topic] ?? avg) / avg; };
+// The reader's blend: topics sit in a row on one bar; the handle's position between two
+// neighbouring topics favours those two (at most two), in proportion to how close it is.
+let mixOrder = ['politics', 'economy', 'conflict', 'science', 'culture', 'world'], mixPos = 0;
+try { const saved = JSON.parse(localStorage.getItem('pp-blend') || 'null'); if (saved) { if (Array.isArray(saved.order) && saved.order.length === mixOrder.length && saved.order.every(k => TOPICS[k])) mixOrder = saved.order; if (Number.isFinite(saved.pos)) mixPos = Math.max(0, Math.min(1, saved.pos)); } } catch (e) {}
+const mixStops = () => ['all', ...mixOrder];
+function blendWeights() {
+  const st = mixStops(), n = st.length - 1, x = mixPos * n, k = Math.min(n - 1, Math.floor(x)), t = x - k, w = {};
+  if (st[k] !== 'all' && 1 - t > .02) w[st[k]] = 1 - t;
+  if (st[k + 1] !== 'all' && t > .02) w[st[k + 1]] = t;
+  return w;
+}
+const balanced = () => Object.keys(blendWeights()).length === 0;
+const mixWeight = e => 1 + 3 * (blendWeights()[e.topic] || 0);
 let seen = new Set(), active = null, filter = 'all', query = '', view = 'globe', rotation = [-16, -18, 0], zoom = 1, projection, world, animation;
 const ZMAX = 6;
 const flat = {z: 1, lon: 0, lat: 0, k0: 1};
@@ -182,32 +189,58 @@ function openStory(id, focus = true) {
 function closeStory() { active = null; if (zoom <= 1.13) zoomTo(1); resumeAt = performance.now() + 2500; $('#edition-view').hidden = false; $('#story-view').hidden = true; $('#map-subtitle').textContent = 'Explore the world at your pace.'; renderFront(); }
 function step(n) { const list = filtered(), pool = list.some(e => e.id === active?.id) ? list : byScore; openStory(pool[(pool.findIndex(e => e.id === active?.id) + n + pool.length) % pool.length].id); }
 
-function buildMixer() {
+function buildMixbar() {
+  const glass = $('#mix-glass'), stopsEl = $('#mix-stops'), thumb = $('#mix-thumb');
   const counts = {}; events.forEach(e => counts[e.topic] = (counts[e.topic] || 0) + 1);
-  $('#faders').innerHTML = Object.entries(TOPICS).map(([k, label]) =>
-    '<label class="fader" title="' + label + ': ' + (counts[k] || 0) + ' stories"><span class="fader-val" data-val="' + k + '"></span>' +
-    '<input type="range" min="0" max="100" step="1" data-topic="' + k + '" value="' + mix[k] + '" aria-label="' + label + ' in your mix">' +
-    '<span class="fader-label">' + label + '</span><span class="fader-count">' + (counts[k] || 0) + '</span></label>').join('');
-  let raf = 0;
-  $$('#faders input').forEach(inp => {
-    paintFader(inp);
-    inp.oninput = () => {
-      mix[inp.dataset.topic] = Number(inp.value); paintFader(inp);
-      try { localStorage.setItem('pp-mix', JSON.stringify(mix)); } catch (e) {}
-      $('#mix-reset').hidden = balanced();
-      cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (active) return drawPins(); renderFront(); });
-    };
+  const save = () => { try { localStorage.setItem('pp-blend', JSON.stringify({order: mixOrder, pos: mixPos})); } catch (e) {} };
+  const pad = 25; // keeps the handle inside the glass at both ends
+  const xOf = f => pad + f * (glass.clientWidth - 2 * pad);
+  const fOf = px => Math.max(0, Math.min(1, (px - pad) / (glass.clientWidth - 2 * pad)));
+  let raf = 0, sorting = null;
+  const apply = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (active) drawPins(); else renderFront(); }); };
+  function paint() {
+    const st = mixStops(), n = st.length - 1, w = blendWeights();
+    stopsEl.innerHTML = st.map((k, i) => '<span class="mix-stop' + (k === 'all' ? ' is-all' : '') + (w[k] ? ' is-on' : '') + (sorting && sorting.k === k ? ' is-moving' : '') + '" data-k="' + k + '" title="' + (k === 'all' ? 'No preference' : TOPICS[k] + ': ' + (counts[k] || 0) + ' stories · drag to move') + '" style="left:' + (sorting && sorting.k === k ? sorting.x : xOf(i / n)) + 'px;--w:' + (w[k] || 0).toFixed(2) + '">' + (k === 'all' ? 'All' : TOPICS[k]) + '</span>').join('');
+    thumb.style.left = xOf(mixPos) + 'px'; $('#mix-fill').style.width = Math.max(0, xOf(mixPos) - 18) + 'px';
+    const parts = Object.entries(w).sort((a, b) => b[1] - a[1]);
+    const txt = !parts.length ? 'Balanced' : parts.length === 1 || parts[0][1] > .92 ? TOPICS[parts[0][0]] : parts.map(([k, v]) => TOPICS[k] + ' ' + Math.round(v * 100) + '%').join(' · ');
+    $('#mix-readout').textContent = txt; thumb.setAttribute('aria-valuenow', Math.round(mixPos * 100)); thumb.setAttribute('aria-valuetext', txt);
+  }
+  // One pointer handler for the whole bar: a press on a topic label reorders it; anywhere else moves the handle.
+  let mode = null;
+  glass.addEventListener('pointerdown', e => {
+    const stop = e.target.closest('.mix-stop:not(.is-all)');
+    glass.setPointerCapture(e.pointerId);
+    if (stop) {
+      const fav = Object.entries(blendWeights()).sort((a, b) => b[1] - a[1])[0];
+      mode = 'sort'; sorting = {k: stop.dataset.k, x: e.clientX - glass.getBoundingClientRect().left, fav: fav && fav[0]};
+      glass.classList.add('is-sorting'); paint(); return;
+    }
+    mode = 'slide'; glass.classList.add('is-dragging'); mixPos = fOf(e.clientX - glass.getBoundingClientRect().left); paint(); apply();
   });
-  $('#mix-reset').hidden = balanced();
-  $('#mix-reset').onclick = () => { Object.keys(mix).forEach(k => mix[k] = MIX_DEFAULT); try { localStorage.removeItem('pp-mix'); } catch (e) {} $$('#faders input').forEach(i => { i.value = MIX_DEFAULT; paintFader(i); }); $('#mix-reset').hidden = true; renderFront(); };
+  glass.addEventListener('pointermove', e => {
+    if (!mode) return;
+    const x = e.clientX - glass.getBoundingClientRect().left;
+    if (mode === 'slide') { mixPos = fOf(x); paint(); apply(); return; }
+    sorting.x = Math.max(pad, Math.min(glass.clientWidth - pad, x));
+    const n = mixOrder.length, slot = Math.max(1, Math.min(n, Math.round(fOf(x) * n))) - 1, from = mixOrder.indexOf(sorting.k);
+    if (slot !== from) {
+      mixOrder.splice(from, 1); mixOrder.splice(slot, 0, sorting.k);
+      if (sorting.fav) mixPos = mixStops().indexOf(sorting.fav) / n; // the handle stays on the topic it favoured
+      apply();
+    }
+    paint();
+  });
+  const end = () => {
+    if (mode === 'slide') { const n = mixStops().length - 1, near = Math.round(mixPos * n) / n; if (Math.abs(near - mixPos) < .035) { mixPos = near; apply(); } }
+    mode = null; sorting = null; glass.classList.remove('is-dragging', 'is-sorting'); paint(); save();
+  };
+  glass.addEventListener('pointerup', end); glass.addEventListener('pointercancel', end);
+  thumb.addEventListener('keydown', e => { const d = {ArrowLeft: -.02, ArrowDown: -.02, ArrowRight: .02, ArrowUp: .02}[e.key]; if (!d) return; e.preventDefault(); mixPos = Math.max(0, Math.min(1, mixPos + d)); paint(); apply(); save(); });
+  new ResizeObserver(paint).observe(glass);
+  paint();
 }
-function paintFader(inp) {
-  const v = Number(inp.value);
-  inp.style.setProperty('--v', v + '%');
-  inp.closest('.fader').classList.toggle('muted', v === 0);
-  $('[data-val="' + inp.dataset.topic + '"]').textContent = v === 0 ? 'off' : v === 100 ? 'max' : '';
-}
-buildMixer();
+buildMixbar();
 $$('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); if (active) closeStory(); else renderFront(); });
 $('#search').oninput = e => { query = e.target.value.trim().toLowerCase(); renderFront(); };
 $('#random-button').onclick = () => { const list = filtered(); if (!list.length) return; const unread = list.filter(e => !seen.has(e.id)), pool = unread.length ? unread : list; openStory(pool[Math.floor(Math.random() * pool.length)].id); };
@@ -344,7 +377,7 @@ function drawPins() {
     b.classList.toggle('is-active', e.id === active?.id);
     b.classList.toggle('is-seen', seen.has(e.id)); b.querySelector('.fig').classList.toggle('is-seen', seen.has(e.id));
     b.classList.toggle('dim', !!active && e.id !== active.id);
-    const w = mixWeight(e); b.classList.toggle('off-focus', !balanced() && w < .55 && e.id !== active?.id); b.style.setProperty('--mixop', Math.min(1, .3 + .7 * Math.min(1, w)).toFixed(2));
+    const bal = balanced(), w = mixWeight(e); b.classList.toggle('off-focus', !bal && w < 1.3 && e.id !== active?.id); b.style.setProperty('--mixop', bal || w >= 1.3 ? 1 : .42);
     if (!on) return;
     placed.push({e, b, l, x, y, ox: x, oy: y, r: sizeOf(e) / 2 + 2, edge: d});
   });
