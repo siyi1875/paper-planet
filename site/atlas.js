@@ -7,7 +7,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const TONES = {urgent: 'Urgent', neutral: 'Neutral', good: 'Good news'};
 const TOPICS = {politics: 'Politics', economy: 'Economy', conflict: 'Conflict', science: 'Science', culture: 'Sport & culture'};
-const TOPIC_OF_ICON = {summit: 'politics', speaker: 'politics', flagpost: 'politics', ballot: 'politics', protest: 'politics', court: 'politics', migrants: 'politics', missile: 'conflict', blast: 'conflict', bank: 'economy', chart: 'economy', coin: 'economy', barrel: 'economy', oil: 'economy', factory: 'economy', tanker: 'economy', robot: 'science', medic: 'science', footballer: 'culture', guitar: 'culture', plane: 'culture'};
+const TOPIC_OF_ICON = {summit: 'politics', speaker: 'politics', flagpost: 'politics', ballot: 'politics', protest: 'politics', court: 'politics', migrants: 'politics', missile: 'conflict', blast: 'conflict', bank: 'economy', chart: 'economy', coin: 'economy', barrel: 'economy', oil: 'economy', factory: 'economy', tanker: 'economy', robot: 'science', medic: 'science', footballer: 'culture', guitar: 'culture'};
 const REGIONS = {europe: 'Europe', asia: 'Asia', africa: 'Africa', north_america: 'North America', south_america: 'South America', oceania: 'Oceania'};
 
 /* Monoline figures, one per kind of story (names match scripts/build_events.py). */

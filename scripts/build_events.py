@@ -85,7 +85,7 @@ TOPIC_OF_ICON = {
     **dict.fromkeys(["missile", "blast"], "conflict"),
     **dict.fromkeys(["bank", "chart", "coin", "barrel", "oil", "factory", "tanker"], "economy"),
     **dict.fromkeys(["robot", "medic"], "science"),
-    **dict.fromkeys(["footballer", "guitar", "plane"], "culture"),
+    **dict.fromkeys(["footballer", "guitar"], "culture"),
 }  # everything else (floods, fires, quakes, accidents) is general world news
 # Make sure the smaller topics are represented, so choosing them on the page shows something.
 TOPIC_MIN = {"economy": 3, "science": 2, "culture": 3, "conflict": 2}
@@ -406,6 +406,7 @@ def fetch_page_meta(url: str, domain: str, session: requests.Session) -> dict | 
         title = m.group(1) if m else ""
     title = strip_site_suffix(clean_text(fix_mojibake(title), 200), domain)
     title = re.sub(r"^(news|breaking|update|exclusive|video|photos?)\s*[:|-]\s*", "", title, flags=re.I)
+    title = re.sub(r"\s+[-|–]\s+[\w.-]+\.(com|net|org|co\.uk|com\.au|in|ng|co)$", "", title, flags=re.I)
     if len(title) < 18 or BAD_TITLE.search(title):
         return None
     locale = (meta.get("og:locale") or "en").lower()
