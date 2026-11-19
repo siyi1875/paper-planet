@@ -6,7 +6,7 @@ const root = document.getElementById('atlas-app'), $ = s => root.querySelector(s
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const TONES = {urgent: 'Urgent', neutral: 'Neutral', good: 'Good news'};
-const TOPICS = {politics: 'Politics', economy: 'Economy', conflict: 'Conflict', science: 'Science', culture: 'Sport & culture'};
+const TOPICS = {world: 'World', politics: 'Politics', economy: 'Economy', conflict: 'Conflict', science: 'Science', culture: 'Culture'};
 const TOPIC_OF_ICON = {summit: 'politics', speaker: 'politics', flagpost: 'politics', ballot: 'politics', protest: 'politics', court: 'politics', migrants: 'politics', missile: 'conflict', blast: 'conflict', bank: 'economy', chart: 'economy', coin: 'economy', barrel: 'economy', oil: 'economy', factory: 'economy', tanker: 'economy', robot: 'science', medic: 'science', footballer: 'culture', guitar: 'culture'};
 const REGIONS = {europe: 'Europe', asia: 'Asia', africa: 'Africa', north_america: 'North America', south_america: 'South America', oceania: 'Oceania'};
 
@@ -52,9 +52,17 @@ catch (e) { $('#edition-date').textContent = 'Edition unavailable'; $('#story-li
 const continentOf = e => e.continent || (e.lat < -10 && e.lon > 110 ? 'oceania' : e.lon < -30 ? (e.lat > 12 ? 'north_america' : 'south_america') : e.lon > 60 || (e.lat > 12 && e.lon > 34) ? 'asia' : e.lat > 36 ? 'europe' : 'africa');
 const events = data.events.map((e, i) => ({...e, topic: e.topic || TOPIC_OF_ICON[e.icon] || 'world', continent: continentOf(e), score: e.score ?? ({heavy: 3, normal: 2, light: 1}[e.weight] || 2) * 100 - i}));
 const byScore = [...events].sort((a, b) => b.score - a.score);
+// Rank on a log scale so a slider can lift a smaller story past a bigger one without erasing size entirely.
+const logMax = Math.log(1 + Math.max(...events.map(e => e.score), 1));
+const mixed = e => Math.log(1 + e.score) / logMax * Math.pow(mixWeight(e), 1.6);
 const isSeed = /seed/i.test(data.day.label || '') || /seed/.test(data.day.edition || '');
 
-let focus = 'all'; try { focus = localStorage.getItem('pp-focus') || 'all'; if (focus !== 'all' && !TOPICS[focus]) focus = 'all'; } catch (e) {}
+// The reader's mix: one weight per topic, 0-100. Equal weights = the plain front page.
+const MIX_DEFAULT = 50;
+let mix = Object.fromEntries(Object.keys(TOPICS).map(k => [k, MIX_DEFAULT]));
+try { const saved = JSON.parse(localStorage.getItem('pp-mix') || 'null'); if (saved) Object.keys(mix).forEach(k => { if (Number.isFinite(saved[k])) mix[k] = Math.max(0, Math.min(100, saved[k])); }); } catch (e) {}
+const balanced = () => Object.values(mix).every(v => v === Object.values(mix)[0]);
+const mixWeight = e => { const vals = Object.values(mix), avg = vals.reduce((a, b) => a + b, 0) / vals.length || 1; return (mix[e.topic] ?? avg) / avg; };
 let seen = new Set(), active = null, filter = 'all', query = '', view = 'globe', rotation = [-16, -18, 0], zoom = 1, projection, world, animation;
 const ZMAX = 6;
 const flat = {z: 1, lon: 0, lat: 0, k0: 1};
@@ -94,7 +102,7 @@ let toastTimer;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600); }
 
 /* ---------- front page ---------- */
-const filtered = () => byScore.filter(e => (filter === 'all' || e.tone === filter) && (!query || [e.title, e.place, e.country, e.source, REGIONS[e.continent]].join(' ').toLowerCase().includes(query)));
+const filtered = () => [...byScore].sort((a, b) => mixed(b) - mixed(a)).filter(e => (filter === 'all' || e.tone === filter) && (!query || [e.title, e.place, e.country, e.source, REGIONS[e.continent]].join(' ').toLowerCase().includes(query)));
 function leadNumber(e) {
   const custom = (e.stats || []).find(s => !/news sources|mentions tracked/i.test(s.l));
   if (custom) return {v: custom.v, l: custom.l};
@@ -110,14 +118,12 @@ function renderFront() {
   $$('[data-count]').forEach(c => c.textContent = counts[c.dataset.count] || 0);
   const list = filtered(), seenCls = e => seen.has(e.id) ? ' is-seen' : '';
   if (!list.length) { $('#lead').innerHTML = ''; $('#secondary').innerHTML = ''; $('#story-list').innerHTML = '<p class="empty">No stories match. Try another place or clear your search.</p>'; frontIds = new Set(); drawPins(); return; }
-  const inFocus = focus === 'all' ? [] : list.filter(e => e.topic === focus);
-  const lead = inFocus[0] || list[0];
-  const focusRest = inFocus.slice(1), others = list.filter(e => e !== lead && !focusRest.includes(e));
+  const lead = list[0], top = balanced() ? [] : list.slice(1, 5), others = list.filter(e => e !== lead && !top.includes(e));
   frontIds = new Set([lead.id]);
   const reports = lead.reports > 1 ? ' · ' + lead.reports + ' reports' : '';
   $('#lead').innerHTML = '<button class="lead story-link' + seenCls(lead) + '" data-id="' + esc(lead.id) + '" data-tone="' + esc(lead.tone) + '">' + kicker(lead) + '<h2>' + esc(lead.title) + '</h2><p>' + esc(lead.what) + '</p>' + (lead.source ? '<span class="lead-source">' + esc(lead.source) + reports + '</span>' : '') + '</button>';
   const rowHTML = e => '<button class="row story-link' + seenCls(e) + '" data-id="' + esc(e.id) + '" data-tone="' + esc(e.tone) + '"><i class="tone-dot ' + esc(e.tone) + '"></i><div><span class="place">' + esc(e.place) + (e.country && e.country !== e.place ? ', ' + esc(e.country) : '') + '</span><h4>' + esc(e.title) + '</h4></div></button>';
-  $('#secondary').innerHTML = focus !== 'all' ? '<section class="region in-focus"><div class="region-head"><b>' + TOPICS[focus] + '</b><span>' + inFocus.length + '</span></div>' + (focusRest.length ? focusRest.map(rowHTML).join('') : (inFocus.length ? '' : '<p class="empty">No ' + TOPICS[focus].toLowerCase() + ' stories in this edition yet.</p>')) + '</section>' : '';
+  $('#secondary').innerHTML = top.length ? '<section class="region in-focus"><div class="region-head"><b>Top of your mix</b><span>' + top.length + '</span></div>' + top.map(rowHTML).join('') + '</section>' : '';
   const groups = {}; others.forEach(e => (groups[e.continent] ||= []).push(e));
   $('#story-list').innerHTML = Object.entries(groups).sort((a, b) => b[1].length - a[1].length).map(([c, list]) =>
     '<section class="region"><div class="region-head"><b>' + (REGIONS[c] || 'Elsewhere') + '</b><span>' + list.length + '</span></div>' +
@@ -176,15 +182,32 @@ function openStory(id, focus = true) {
 function closeStory() { active = null; if (zoom <= 1.13) zoomTo(1); resumeAt = performance.now() + 2500; $('#edition-view').hidden = false; $('#story-view').hidden = true; $('#map-subtitle').textContent = 'Explore the world at your pace.'; renderFront(); }
 function step(n) { const list = filtered(), pool = list.some(e => e.id === active?.id) ? list : byScore; openStory(pool[(pool.findIndex(e => e.id === active?.id) + n + pool.length) % pool.length].id); }
 
-function setFocus(f) {
-  focus = f; try { localStorage.setItem('pp-focus', f); } catch (e) {}
-  $$('[data-focus]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.focus === f)));
-  root.classList.toggle('has-focus', f !== 'all');
-  if (active) closeStory(); else renderFront();
-  $('#edition-view').scrollTop = 0;
+function buildMixer() {
+  const counts = {}; events.forEach(e => counts[e.topic] = (counts[e.topic] || 0) + 1);
+  $('#faders').innerHTML = Object.entries(TOPICS).map(([k, label]) =>
+    '<label class="fader" title="' + label + ': ' + (counts[k] || 0) + ' stories"><span class="fader-val" data-val="' + k + '"></span>' +
+    '<input type="range" min="0" max="100" step="1" data-topic="' + k + '" value="' + mix[k] + '" aria-label="' + label + ' in your mix">' +
+    '<span class="fader-label">' + label + '</span><span class="fader-count">' + (counts[k] || 0) + '</span></label>').join('');
+  let raf = 0;
+  $$('#faders input').forEach(inp => {
+    paintFader(inp);
+    inp.oninput = () => {
+      mix[inp.dataset.topic] = Number(inp.value); paintFader(inp);
+      try { localStorage.setItem('pp-mix', JSON.stringify(mix)); } catch (e) {}
+      $('#mix-reset').hidden = balanced();
+      cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (active) return drawPins(); renderFront(); });
+    };
+  });
+  $('#mix-reset').hidden = balanced();
+  $('#mix-reset').onclick = () => { Object.keys(mix).forEach(k => mix[k] = MIX_DEFAULT); try { localStorage.removeItem('pp-mix'); } catch (e) {} $$('#faders input').forEach(i => { i.value = MIX_DEFAULT; paintFader(i); }); $('#mix-reset').hidden = true; renderFront(); };
 }
-$$('[data-focus]').forEach(b => b.onclick = () => setFocus(b.dataset.focus));
-$$('[data-focus]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.focus === focus))); root.classList.toggle('has-focus', focus !== 'all');
+function paintFader(inp) {
+  const v = Number(inp.value);
+  inp.style.setProperty('--v', v + '%');
+  inp.closest('.fader').classList.toggle('muted', v === 0);
+  $('[data-val="' + inp.dataset.topic + '"]').textContent = v === 0 ? 'off' : v === 100 ? 'max' : '';
+}
+buildMixer();
 $$('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); if (active) closeStory(); else renderFront(); });
 $('#search').oninput = e => { query = e.target.value.trim().toLowerCase(); renderFront(); };
 $('#random-button').onclick = () => { const list = filtered(); if (!list.length) return; const unread = list.filter(e => !seen.has(e.id)), pool = unread.length ? unread : list; openStory(pool[Math.floor(Math.random() * pool.length)].id); };
@@ -321,7 +344,7 @@ function drawPins() {
     b.classList.toggle('is-active', e.id === active?.id);
     b.classList.toggle('is-seen', seen.has(e.id)); b.querySelector('.fig').classList.toggle('is-seen', seen.has(e.id));
     b.classList.toggle('dim', !!active && e.id !== active.id);
-    b.classList.toggle('off-focus', focus !== 'all' && e.topic !== focus && e.id !== active?.id);
+    const w = mixWeight(e); b.classList.toggle('off-focus', !balanced() && w < .55 && e.id !== active?.id); b.style.setProperty('--mixop', Math.min(1, .3 + .7 * Math.min(1, w)).toFixed(2));
     if (!on) return;
     placed.push({e, b, l, x, y, ox: x, oy: y, r: sizeOf(e) / 2 + 2, edge: d});
   });
@@ -381,7 +404,7 @@ stage.addEventListener('wheel', e => { if (root.clientWidth < 701) return; e.pre
 const DWELL = 6500;
 const tour = {
   on: false, current: null, queue: [], i: 0, timer: null, bar: null, userStopped: false,
-  rebuild() { const all = filtered(), f = all.filter(e => focus === 'all' || e.topic === focus), list = f.length >= 2 ? f : all; const unread = list.filter(e => !seen.has(e.id)); this.queue = (unread.length >= 3 ? unread : list).slice(0, 8); },
+  rebuild() { const list = filtered(); const unread = list.filter(e => !seen.has(e.id)); this.queue = (unread.length >= 3 ? unread : list).slice(0, 8); },
   start() {
     if (!world || active) return;
     this.rebuild(); if (!this.queue.length) return;

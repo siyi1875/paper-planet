@@ -30,9 +30,10 @@
       <div class="edition-meta"><span id="edition-date">Loading edition</span><span>WORLD EDITION</span></div>
       <div class="mobile-live" id="mobile-live"></div>
       <h1>The world, <em>unfolding.</em></h1>
-      <nav class="focus" id="focus" aria-label="Front page focus">
-        <button data-focus="all" aria-pressed="true">General</button><button data-focus="politics" aria-pressed="false">Politics</button><button data-focus="economy" aria-pressed="false">Economy</button><button data-focus="conflict" aria-pressed="false">Conflict</button><button data-focus="science" aria-pressed="false">Science</button><button data-focus="culture" aria-pressed="false" title="Sport, arts and culture">Culture</button>
-      </nav>
+      <div class="mixer" id="mixer" role="group" aria-label="Mix your front page">
+        <div class="mixer-head"><span>Mix your front page</span><button id="mix-reset" class="text-button" hidden>Reset</button></div>
+        <div class="faders" id="faders"></div>
+      </div>
       <div class="toolbar">
         <div class="filters" role="group" aria-label="Filter by tone">
           <button data-filter="all" aria-pressed="true">All <span class="count" data-count="all"></span></button>
