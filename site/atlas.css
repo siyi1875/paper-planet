@@ -270,33 +270,32 @@ dialog .credits{font-size:11px;color:var(--muted)}.t-urgent{color:var(--urgent)}
 .speed-control{flex-wrap:nowrap;align-items:center;gap:8px;font-size:0;padding:0 12px 0 8px;border-left:1px solid var(--line)}
 .speed-control span{font-size:10px;min-width:42px;text-align:right;font-variant-numeric:tabular-nums}
 .speed-control input{order:-1;width:72px}
-/* blend bar: frosted glass, topics along it, one handle */
-.mixbar{margin:-2px 0 16px}
-.mixbar-head{display:flex;justify-content:space-between;align-items:baseline;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 2px 7px}
-#mix-readout{letter-spacing:.02em;text-transform:none;font-size:11.5px;font-weight:600;color:var(--ink)}
-.mixbar-glass{position:relative;isolation:isolate;height:66px;border-radius:20px;overflow:hidden;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;
-  background:linear-gradient(180deg,#ffffff8c,#ffffff40);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);
-  box-shadow:inset 0 1px 0 #ffffffe6,inset 0 -1px 0 #1d2b230d,inset 0 0 0 1px #ffffff99,0 10px 26px #2c3f3314,0 1px 2px #2c3f3312}
-.mixbar-aura{position:absolute;inset:0;z-index:-1;pointer-events:none;filter:blur(18px);opacity:.55}
-.mixbar-aura i{position:absolute;width:42%;height:120%;top:-10%;border-radius:50%}
-.mixbar-aura i:nth-child(1){left:-8%;background:#9fc7b4}.mixbar-aura i:nth-child(2){left:30%;background:#e9d9b8}.mixbar-aura i:nth-child(3){left:66%;background:#c9d6e6}
-.mixbar-stops{position:absolute;left:0;right:0;top:9px;height:22px}
-.mix-stop{position:absolute;transform:translateX(-50%);font-size:10px;font-weight:500;letter-spacing:-.01em;color:#5d6a62;white-space:nowrap;padding:3px 3px;border-radius:7px;cursor:grab;
-  transition:left .28s cubic-bezier(.2,.8,.2,1),color .2s,background .2s,transform .2s;display:flex;align-items:baseline;gap:3px}
-.mix-stop small{font-size:8.5px;color:var(--faint);font-variant-numeric:tabular-nums}
-.mix-stop.is-all{cursor:pointer;color:var(--muted)}
-.mix-stop.is-on{color:var(--ink);font-weight:600;transform:translateX(-50%) scale(calc(1 + var(--w) * .05))}
-.mix-stop.is-moving{transition:color .2s,background .2s;cursor:grabbing;z-index:3;background:#ffffffd9;box-shadow:0 4px 14px #1d2b2322}
-.mixbar-glass.is-sorting .mix-stop:not(.is-moving){color:#8b948d}
-.mixbar-track{position:absolute;left:18px;right:18px;top:44px;height:6px;border-radius:6px;background:#1d2b2312;box-shadow:inset 0 1px 2px #1d2b2318}
-.mixbar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:linear-gradient(90deg,#46705d80,var(--deep));transition:width .2s cubic-bezier(.2,.8,.2,1)}
-.mixbar-thumb{position:absolute;top:47px;width:46px;height:24px;margin:-12px 0 0 -23px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:3px;outline:none;
-  background:linear-gradient(180deg,#ffffffee,#f1f2edcc);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
-  box-shadow:inset 0 1px 0 #fff,0 0 0 1px #ffffffb0,0 6px 16px #1d2b2330,0 1px 3px #1d2b2322;transition:left .2s cubic-bezier(.2,.8,.2,1),transform .15s}
-.mixbar-thumb i{width:1.5px;height:10px;border-radius:1px;background:#9aa69c}
-.mixbar-glass.is-dragging .mixbar-thumb,.mixbar-thumb:focus-visible{transform:scale(1.08);box-shadow:inset 0 1px 0 #fff,0 0 0 2px var(--deep),0 8px 20px #1d2b2338}
+/* blend bar: frosted glass, topics along it, one round handle (two colours: sage + white) */
+.mixbar{margin:-4px 0 14px}
+.mixbar-head{display:flex;justify-content:space-between;align-items:baseline;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 2px 5px}
+#mix-readout{letter-spacing:.01em;text-transform:none;font-size:11px;font-weight:600;color:var(--ink)}
+.mixbar-glass{position:relative;isolation:isolate;height:44px;border-radius:14px;overflow:hidden;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none;
+  background:linear-gradient(180deg,#ffffffa6,#ffffff59);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);
+  box-shadow:inset 0 1px 0 #ffffffd9,inset 0 0 0 1px #ffffff8c,0 4px 14px #2c3f330d}
+.mixbar-aura{position:absolute;inset:0;z-index:-1;pointer-events:none;filter:blur(16px);opacity:.4}
+.mixbar-aura i{position:absolute;width:46%;height:130%;top:-15%;border-radius:50%}
+.mixbar-aura i:nth-child(1){left:-10%;background:#a9c7b6}.mixbar-aura i:nth-child(2){left:32%;background:#ffffff}.mixbar-aura i:nth-child(3){left:68%;background:#a9c7b6;opacity:.6}
+.mixbar-stops{position:absolute;left:0;right:0;top:6px;height:18px}
+.mix-stop{position:absolute;transform:translateX(-50%);font-size:9.5px;font-weight:500;letter-spacing:-.005em;color:#7d877f;white-space:nowrap;padding:2px 3px;border-radius:6px;cursor:grab;
+  transition:left .28s cubic-bezier(.2,.8,.2,1),color .2s,background .2s}
+.mix-stop.is-all{cursor:pointer}
+.mix-stop.is-on{color:var(--deep);font-weight:600}
+.mix-stop.is-moving{transition:color .2s,background .2s;cursor:grabbing;z-index:3;color:var(--deep);background:#fff;box-shadow:0 2px 8px #1d2b231f}
+.mixbar-glass.is-sorting .mix-stop:not(.is-moving){color:#a3aba4}
+.mixbar-track{position:absolute;left:14px;right:14px;top:31px;height:3px;border-radius:3px;background:#1d2b2314}
+.mixbar-fill{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--deep);opacity:.85;transition:width .2s cubic-bezier(.2,.8,.2,1)}
+.mixbar-thumb{position:absolute;top:32.5px;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:#fff;outline:none;
+  box-shadow:0 0 0 .5px #1d2b2326,0 2px 6px #1d2b2330;transition:left .2s cubic-bezier(.2,.8,.2,1),transform .15s}
+.mixbar-thumb i{display:none}
+.mixbar-glass.is-dragging .mixbar-thumb{transform:scale(1.15)}
+.mixbar-thumb:focus-visible{box-shadow:0 0 0 2px var(--deep),0 2px 6px #1d2b2330}
 .mixbar-glass.is-dragging .mixbar-thumb,.mixbar-glass.is-dragging .mixbar-fill{transition:none}
-.mixbar-hint{font-size:10px;color:var(--faint);margin:6px 2px 0}
+.mixbar-hint{display:none}
 #secondary .in-focus{margin-top:6px}
 .pin{--mixop:1}.pin:not(.dim){opacity:var(--mixop)}.pin.off-focus .dot{transform:scale(.8)}.pin.off-focus .dot::after{animation:none;opacity:.15}
 /* ---------- responsive ---------- */

@@ -193,7 +193,7 @@ function buildMixbar() {
   const glass = $('#mix-glass'), stopsEl = $('#mix-stops'), thumb = $('#mix-thumb');
   const counts = {}; events.forEach(e => counts[e.topic] = (counts[e.topic] || 0) + 1);
   const save = () => { try { localStorage.setItem('pp-blend', JSON.stringify({order: mixOrder, pos: mixPos})); } catch (e) {} };
-  const pad = 25; // keeps the handle inside the glass at both ends
+  const pad = 22; // keeps the handle inside the glass at both ends
   const xOf = f => pad + f * (glass.clientWidth - 2 * pad);
   const fOf = px => Math.max(0, Math.min(1, (px - pad) / (glass.clientWidth - 2 * pad)));
   let raf = 0, sorting = null;
@@ -201,7 +201,7 @@ function buildMixbar() {
   function paint() {
     const st = mixStops(), n = st.length - 1, w = blendWeights();
     stopsEl.innerHTML = st.map((k, i) => '<span class="mix-stop' + (k === 'all' ? ' is-all' : '') + (w[k] ? ' is-on' : '') + (sorting && sorting.k === k ? ' is-moving' : '') + '" data-k="' + k + '" title="' + (k === 'all' ? 'No preference' : TOPICS[k] + ': ' + (counts[k] || 0) + ' stories · drag to move') + '" style="left:' + (sorting && sorting.k === k ? sorting.x : xOf(i / n)) + 'px;--w:' + (w[k] || 0).toFixed(2) + '">' + (k === 'all' ? 'All' : TOPICS[k]) + '</span>').join('');
-    thumb.style.left = xOf(mixPos) + 'px'; $('#mix-fill').style.width = Math.max(0, xOf(mixPos) - 18) + 'px';
+    thumb.style.left = xOf(mixPos) + 'px'; $('#mix-fill').style.width = Math.max(0, xOf(mixPos) - 14) + 'px';
     const parts = Object.entries(w).sort((a, b) => b[1] - a[1]);
     const txt = !parts.length ? 'Balanced' : parts.length === 1 || parts[0][1] > .92 ? TOPICS[parts[0][0]] : parts.map(([k, v]) => TOPICS[k] + ' ' + Math.round(v * 100) + '%').join(' · ');
     $('#mix-readout').textContent = txt; thumb.setAttribute('aria-valuenow', Math.round(mixPos * 100)); thumb.setAttribute('aria-valuetext', txt);
