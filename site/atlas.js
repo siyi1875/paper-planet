@@ -6,6 +6,8 @@ const root = document.getElementById('atlas-app'), $ = s => root.querySelector(s
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const TONES = {urgent: 'Urgent', neutral: 'Neutral', good: 'Good news'};
+const TOPICS = {politics: 'Politics', economy: 'Economy', conflict: 'Conflict', science: 'Science', culture: 'Sport & culture'};
+const TOPIC_OF_ICON = {summit: 'politics', speaker: 'politics', flagpost: 'politics', ballot: 'politics', protest: 'politics', court: 'politics', migrants: 'politics', missile: 'conflict', blast: 'conflict', bank: 'economy', chart: 'economy', coin: 'economy', barrel: 'economy', oil: 'economy', factory: 'economy', tanker: 'economy', robot: 'science', medic: 'science', footballer: 'culture', guitar: 'culture', plane: 'culture'};
 const REGIONS = {europe: 'Europe', asia: 'Asia', africa: 'Africa', north_america: 'North America', south_america: 'South America', oceania: 'Oceania'};
 
 /* Monoline figures, one per kind of story (names match scripts/build_events.py). */
@@ -48,10 +50,11 @@ let data;
 try { const r = await fetch('data/events.json'); if (!r.ok) throw Error(); data = await r.json(); }
 catch (e) { $('#edition-date').textContent = 'Edition unavailable'; $('#story-list').innerHTML = '<p class="empty">The news edition could not be loaded. Please reload to try again.</p>'; $('#map-loading').textContent = 'News unavailable'; return; }
 const continentOf = e => e.continent || (e.lat < -10 && e.lon > 110 ? 'oceania' : e.lon < -30 ? (e.lat > 12 ? 'north_america' : 'south_america') : e.lon > 60 || (e.lat > 12 && e.lon > 34) ? 'asia' : e.lat > 36 ? 'europe' : 'africa');
-const events = data.events.map((e, i) => ({...e, continent: continentOf(e), score: e.score ?? ({heavy: 3, normal: 2, light: 1}[e.weight] || 2) * 100 - i}));
+const events = data.events.map((e, i) => ({...e, topic: e.topic || TOPIC_OF_ICON[e.icon] || 'world', continent: continentOf(e), score: e.score ?? ({heavy: 3, normal: 2, light: 1}[e.weight] || 2) * 100 - i}));
 const byScore = [...events].sort((a, b) => b.score - a.score);
 const isSeed = /seed/i.test(data.day.label || '') || /seed/.test(data.day.edition || '');
 
+let focus = 'all'; try { focus = localStorage.getItem('pp-focus') || 'all'; if (focus !== 'all' && !TOPICS[focus]) focus = 'all'; } catch (e) {}
 let seen = new Set(), active = null, filter = 'all', query = '', view = 'globe', rotation = [-16, -18, 0], zoom = 1, projection, world, animation;
 const ZMAX = 6;
 const flat = {z: 1, lon: 0, lat: 0, k0: 1};
@@ -107,14 +110,18 @@ function renderFront() {
   $$('[data-count]').forEach(c => c.textContent = counts[c.dataset.count] || 0);
   const list = filtered(), seenCls = e => seen.has(e.id) ? ' is-seen' : '';
   if (!list.length) { $('#lead').innerHTML = ''; $('#secondary').innerHTML = ''; $('#story-list').innerHTML = '<p class="empty">No stories match. Try another place or clear your search.</p>'; frontIds = new Set(); drawPins(); return; }
-  const [lead, ...others] = list;
+  const inFocus = focus === 'all' ? [] : list.filter(e => e.topic === focus);
+  const lead = inFocus[0] || list[0];
+  const focusRest = inFocus.slice(1), others = list.filter(e => e !== lead && !focusRest.includes(e));
   frontIds = new Set([lead.id]);
-  $('#lead').innerHTML = '<button class="lead story-link' + seenCls(lead) + '" data-id="' + esc(lead.id) + '" data-tone="' + esc(lead.tone) + '">' + kicker(lead) + '<h2>' + esc(lead.title) + '</h2><p>' + esc(lead.what) + '</p>' + (lead.source ? '<span class="lead-source">' + esc(lead.source) + '</span>' : '') + '</button>';
-  $('#secondary').innerHTML = '';
+  const reports = lead.reports > 1 ? ' · ' + lead.reports + ' reports' : '';
+  $('#lead').innerHTML = '<button class="lead story-link' + seenCls(lead) + '" data-id="' + esc(lead.id) + '" data-tone="' + esc(lead.tone) + '">' + kicker(lead) + '<h2>' + esc(lead.title) + '</h2><p>' + esc(lead.what) + '</p>' + (lead.source ? '<span class="lead-source">' + esc(lead.source) + reports + '</span>' : '') + '</button>';
+  const rowHTML = e => '<button class="row story-link' + seenCls(e) + '" data-id="' + esc(e.id) + '" data-tone="' + esc(e.tone) + '"><i class="tone-dot ' + esc(e.tone) + '"></i><div><span class="place">' + esc(e.place) + (e.country && e.country !== e.place ? ', ' + esc(e.country) : '') + '</span><h4>' + esc(e.title) + '</h4></div></button>';
+  $('#secondary').innerHTML = focus !== 'all' ? '<section class="region in-focus"><div class="region-head"><b>' + TOPICS[focus] + '</b><span>' + inFocus.length + '</span></div>' + (focusRest.length ? focusRest.map(rowHTML).join('') : (inFocus.length ? '' : '<p class="empty">No ' + TOPICS[focus].toLowerCase() + ' stories in this edition yet.</p>')) + '</section>' : '';
   const groups = {}; others.forEach(e => (groups[e.continent] ||= []).push(e));
   $('#story-list').innerHTML = Object.entries(groups).sort((a, b) => b[1].length - a[1].length).map(([c, list]) =>
     '<section class="region"><div class="region-head"><b>' + (REGIONS[c] || 'Elsewhere') + '</b><span>' + list.length + '</span></div>' +
-    list.map(e => '<button class="row story-link' + seenCls(e) + '" data-id="' + esc(e.id) + '" data-tone="' + esc(e.tone) + '"><i class="tone-dot ' + esc(e.tone) + '"></i><div><span class="place">' + esc(e.place) + (e.country && e.country !== e.place ? ', ' + esc(e.country) : '') + '</span><h4>' + esc(e.title) + '</h4></div></button>').join('') + '</section>').join('');
+    list.map(rowHTML).join('') + '</section>').join('');
   $$('.story-link').forEach(b => {
     b.onclick = () => openStory(b.dataset.id);
     b.onmouseenter = b.onfocus = () => linkStory(b.dataset.id, true);
@@ -169,6 +176,15 @@ function openStory(id, focus = true) {
 function closeStory() { active = null; if (zoom <= 1.13) zoomTo(1); resumeAt = performance.now() + 2500; $('#edition-view').hidden = false; $('#story-view').hidden = true; $('#map-subtitle').textContent = 'Explore the world at your pace.'; renderFront(); }
 function step(n) { const list = filtered(), pool = list.some(e => e.id === active?.id) ? list : byScore; openStory(pool[(pool.findIndex(e => e.id === active?.id) + n + pool.length) % pool.length].id); }
 
+function setFocus(f) {
+  focus = f; try { localStorage.setItem('pp-focus', f); } catch (e) {}
+  $$('[data-focus]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.focus === f)));
+  root.classList.toggle('has-focus', f !== 'all');
+  if (active) closeStory(); else renderFront();
+  $('#edition-view').scrollTop = 0;
+}
+$$('[data-focus]').forEach(b => b.onclick = () => setFocus(b.dataset.focus));
+$$('[data-focus]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.focus === focus))); root.classList.toggle('has-focus', focus !== 'all');
 $$('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); if (active) closeStory(); else renderFront(); });
 $('#search').oninput = e => { query = e.target.value.trim().toLowerCase(); renderFront(); };
 $('#random-button').onclick = () => { const list = filtered(); if (!list.length) return; const unread = list.filter(e => !seen.has(e.id)), pool = unread.length ? unread : list; openStory(pool[Math.floor(Math.random() * pool.length)].id); };
@@ -305,6 +321,7 @@ function drawPins() {
     b.classList.toggle('is-active', e.id === active?.id);
     b.classList.toggle('is-seen', seen.has(e.id)); b.querySelector('.fig').classList.toggle('is-seen', seen.has(e.id));
     b.classList.toggle('dim', !!active && e.id !== active.id);
+    b.classList.toggle('off-focus', focus !== 'all' && e.topic !== focus && e.id !== active?.id);
     if (!on) return;
     placed.push({e, b, l, x, y, ox: x, oy: y, r: sizeOf(e) / 2 + 2, edge: d});
   });
@@ -364,7 +381,7 @@ stage.addEventListener('wheel', e => { if (root.clientWidth < 701) return; e.pre
 const DWELL = 6500;
 const tour = {
   on: false, current: null, queue: [], i: 0, timer: null, bar: null, userStopped: false,
-  rebuild() { const list = filtered(); const unread = list.filter(e => !seen.has(e.id)); this.queue = (unread.length >= 3 ? unread : list).slice(0, 8); },
+  rebuild() { const all = filtered(), f = all.filter(e => focus === 'all' || e.topic === focus), list = f.length >= 2 ? f : all; const unread = list.filter(e => !seen.has(e.id)); this.queue = (unread.length >= 3 ? unread : list).slice(0, 8); },
   start() {
     if (!world || active) return;
     this.rebuild(); if (!this.queue.length) return;
