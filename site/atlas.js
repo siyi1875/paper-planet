@@ -48,7 +48,7 @@ const kicker = (e, g) => '<span class="kicker" data-tone="'+esc(e.tone)+'">'+(g?
 /* ---------- data ---------- */
 let data;
 try { const r = await fetch('data/events.json'); if (!r.ok) throw Error(); data = await r.json(); }
-catch (e) { $('#edition-date').textContent = 'Edition unavailable'; $('#story-list').innerHTML = '<p class="empty">The news edition could not be loaded. Please reload to try again.</p>'; $('#map-loading').textContent = 'News unavailable'; return; }
+catch (e) { if ($('#edition-date'))  $('#story-list').innerHTML = '<p class="empty">The news edition could not be loaded. Please reload to try again.</p>'; $('#map-loading').textContent = 'News unavailable'; return; }
 const continentOf = e => e.continent || (e.lat < -10 && e.lon > 110 ? 'oceania' : e.lon < -30 ? (e.lat > 12 ? 'north_america' : 'south_america') : e.lon > 60 || (e.lat > 12 && e.lon > 34) ? 'asia' : e.lat > 36 ? 'europe' : 'africa');
 const events = data.events.map((e, i) => ({...e, topic: e.topic || TOPIC_OF_ICON[e.icon] || 'world', continent: continentOf(e), score: e.score ?? ({heavy: 3, normal: 2, light: 1}[e.weight] || 2) * 100 - i}));
 const byScore = [...events].sort((a, b) => b.score - a.score);
@@ -90,7 +90,7 @@ function liveLine() {
   $('#live-text').innerHTML = (fresh ? '<b>LIVE</b> ' : '') + 'Updated ' + esc(data.day.updated || '') + (fresh ? next : ' · ' + esc(data.day.label || ''));
   $('#mobile-live').innerHTML = pill.innerHTML; $('#mobile-live').classList.toggle('is-live', fresh);
 }
-$('#edition-date').textContent = new Date(data.day.iso + 'T12:00:00').toLocaleDateString('en-GB', {weekday: 'long', day: 'numeric', month: 'long'});
+if ($('#edition-date')) $('#edition-date').textContent = new Date(data.day.iso + 'T12:00:00').toLocaleDateString('en-GB', {weekday: 'long', day: 'numeric', month: 'long'});
 liveLine(); setInterval(liveLine, 60000);
 
 /* ---------- progress ---------- */
@@ -204,7 +204,7 @@ function buildMixbar() {
     thumb.style.left = xOf(mixPos) + 'px'; $('#mix-fill').style.width = Math.max(0, xOf(mixPos) - 14) + 'px';
     const parts = Object.entries(w).sort((a, b) => b[1] - a[1]);
     const txt = !parts.length ? 'Balanced' : parts.length === 1 || parts[0][1] > .92 ? TOPICS[parts[0][0]] : parts.map(([k, v]) => TOPICS[k] + ' ' + Math.round(v * 100) + '%').join(' · ');
-    $('#mix-readout').textContent = txt; thumb.setAttribute('aria-valuenow', Math.round(mixPos * 100)); thumb.setAttribute('aria-valuetext', txt);
+    const ro = $('#mix-readout'); ro.textContent = parts.length ? txt : ''; ro.hidden = !parts.length; thumb.setAttribute('aria-valuenow', Math.round(mixPos * 100)); thumb.setAttribute('aria-valuetext', txt);
   }
   // One pointer handler for the whole bar: a press on a topic label reorders it; anywhere else moves the handle.
   let mode = null;
