@@ -27,15 +27,14 @@
 <section class="editorial" aria-label="News edition">
   <div id="edition-view">
     <div class="front-top">
-      <div class="edition-meta"><span id="edition-date">Loading edition</span><span>WORLD EDITION</span></div>
       <div class="mobile-live" id="mobile-live"></div>
       <h1>The world, <em>unfolding.</em></h1>
       <div class="mixbar" id="mixbar">
-        <div class="mixbar-head" title="Slide between two topics to blend them; drag a topic to move it"><span>Tune your front page</span><span id="mix-readout">Balanced</span></div>
-        <div class="mixbar-glass" id="mix-glass">
+        
+        <div class="mixbar-glass" id="mix-glass" title="Slide between two topics to blend them; drag a topic to move it">
           <div class="mixbar-aura" aria-hidden="true"><i></i><i></i><i></i></div>
           <div class="mixbar-stops" id="mix-stops"></div>
-          <div class="mixbar-track" aria-hidden="true"><i class="mixbar-fill" id="mix-fill"></i></div>
+          <span class="mix-readout" id="mix-readout" hidden></span><div class="mixbar-track" aria-hidden="true"><i class="mixbar-fill" id="mix-fill"></i></div>
           <div class="mixbar-thumb" id="mix-thumb" role="slider" tabindex="0" aria-label="Blend of topics on your front page" aria-valuemin="0" aria-valuemax="100"><i></i><i></i><i></i></div>
         </div>
         <div class="mixbar-hint">Slide between two topics to blend them · drag a topic to move it</div>
@@ -47,14 +46,14 @@
           <button data-filter="neutral" aria-pressed="false"><i class="tone-dot neutral"></i>Neutral <span class="count" data-count="neutral"></span></button>
           <button data-filter="good" aria-pressed="false"><i class="tone-dot good"></i>Good <span class="count" data-count="good"></span></button>
         </div>
-        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Find a place or a story" aria-label="Find a place or a story"><span aria-hidden="true">/</span></label>
+        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="Find a place or a story" aria-label="Find a place or a story"></label>
       </div>
     </div>
     <div id="lead"></div>
     <div id="front-rest"><div id="secondary"></div><div id="story-list"></div></div>
   </div>
   <article id="story-view" hidden></article>
-  <div class="editorial-footer"><span id="footer-note">Your world, one story at a time.</span><button id="random-button" class="text-button">Surprise me <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></div>
+  <div class="editorial-footer"><span id="footer-note"></span><button id="random-button" class="text-button">Surprise me <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></div>
 </section>
 
 <section class="map-panel" aria-label="Interactive news atlas">

@@ -305,6 +305,9 @@ h1{margin:16px 0 30px}
 .toolbar{gap:22px;margin-bottom:30px}
 .filters{gap:8px}
 .filters button{padding:6px 12px}
+/* fewer words: no date/edition line, no bar label; the blend shows inside the bar only when set */
+h1{margin-top:6px}
+.mix-readout{display:none!important}
 /* ---------- responsive ---------- */
 @media(min-width:1500px){.workspace{grid-template-columns:460px minmax(0,1fr)}h1{font-size:52px}}
 @media(max-width:1100px){.workspace{grid-template-columns:360px minmax(0,1fr)}.hints{display:none}.live-pill .when{display:none}}
