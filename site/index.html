@@ -4,9 +4,20 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Explore world news by where it happens. An interactive atlas of headlines from around the planet, refreshed every three hours.">
 <title>Paper Planet — The world, unfolding.</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#efeee8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Paper Planet">
+<meta property="og:title" content="Paper Planet — the world's news, on a living globe">
+<meta property="og:description" content="Today's headlines placed where they happen. Refreshed every three hours. No AI, no ads.">
+<meta property="og:image" content="https://siyi1875.github.io/paper-planet/assets/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://siyi1875.github.io/paper-planet/assets/og.jpg">
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="atlas.css">
-<script src="vendor/d3.min.js" defer></script><script src="atlas.js" defer></script>
+<script src="config.js"></script><script src="vendor/d3.min.js" defer></script><script src="atlas.js" defer></script>
 </head>
 <body>
 <div id="atlas-app">
@@ -53,7 +64,7 @@
     <div id="front-rest"><div id="secondary"></div><div id="story-list"></div></div>
   </div>
   <article id="story-view" hidden></article>
-  <div class="editorial-footer"><span id="footer-note"></span><button id="random-button" class="text-button">Surprise me <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></div>
+  <div class="editorial-footer"><span id="footer-note"></span><form class="signup" id="signup" hidden><input type="email" id="signup-email" placeholder="The world in 5 stories, every Monday" aria-label="Email for the weekly 5 stories" required><button type="submit" aria-label="Subscribe">→</button></form><button id="random-button" class="text-button">Surprise me <svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></button></div>
 </section>
 
 <section class="map-panel" aria-label="Interactive news atlas">
@@ -86,7 +97,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<dialog id="about-dialog"><button id="close-about" class="close-button" aria-label="Close about">×</button><h2>A world worth understanding.</h2><p>Paper Planet puts news where it happens. Every figure on the globe is one story, standing where it happened. Open it for a short summary, a few numbers and a link to the source.</p><p>The edition rebuilds every three hours from GDELT events and publishers’ page metadata. Headlines and summaries are the publishers’ own; no AI writes them. Colour shows what the story means for the people in it — <b class="t-urgent">urgent</b> when people are harmed or in danger, <b class="t-good">good</b> when something measurably improved, <b class="t-neutral">neutral</b> for everything else — never approval.</p><p class="credits">Geography: Natural Earth via world-atlas. Map projection: D3. Earth texture: three.js examples (MIT). News belongs to its publishers.</p></dialog>
+<dialog id="about-dialog"><button id="close-about" class="close-button" aria-label="Close about">×</button><h2>A world worth understanding.</h2><p>Paper Planet puts news where it happens. Every figure on the globe is one story, standing where it happened. Open it for a short summary, a few numbers and a link to the source.</p><p>The edition rebuilds every three hours from GDELT events and publishers’ page metadata. Headlines and summaries are the publishers’ own; no AI writes them. Colour shows what the story means for the people in it — <b class="t-urgent">urgent</b> when people are harmed or in danger, <b class="t-good">good</b> when something measurably improved, <b class="t-neutral">neutral</b> for everything else — never approval.</p><p id="about-extra"></p><p class="credits">News data: The GDELT Project. Geography: Natural Earth via world-atlas. Map projection: D3. Earth texture: three.js examples (MIT). News belongs to its publishers.</p></dialog>
 </div>
 </body>
 </html>

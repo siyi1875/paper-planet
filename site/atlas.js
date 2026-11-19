@@ -2,6 +2,10 @@
    Reading always wins over motion: hovering, dragging, searching or reading pauses the tour and orbit. */
 (async function () {
 'use strict';
+const CFG = window.PP_CONFIG || {};
+// Privacy-friendly analytics (GoatCounter: no cookies, no banner). Off until a site code is set in config.js.
+if (CFG.goatcounter) { const g = document.createElement('script'); g.async = true; g.src = 'https://gc.zgo.at/count.js'; g.dataset.goatcounter = 'https://' + CFG.goatcounter + '.goatcounter.com/count'; document.head.appendChild(g); }
+const track = (name, title) => { try { window.goatcounter?.count?.({path: name, title: title || name, event: true}); } catch (e) {} };
 const root = document.getElementById('atlas-app'), $ = s => root.querySelector(s), $$ = s => [...root.querySelectorAll(s)];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
@@ -179,20 +183,30 @@ function openStory(id, focus = true) {
     (stats.length ? '<div class="article-stats">' + stats.map(s => '<div><strong>' + esc(s.v) + '</strong><span>' + esc(s.l) + '</span></div>').join('') + '</div>' : '') +
     (e.jargon ? '<section class="article-section"><h3>' + esc(e.jargon.term) + '</h3><p>' + esc(e.jargon.def) + '</p></section>' : '') +
     (url ? '<a class="source-link" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">Read the full story at ' + esc(e.source || new URL(url).hostname) + '<svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a>' : '') +
+    '<button class="share-button text-button" id="share-story"><svg class="arrow-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>Share this story</button>' +
     '<nav class="article-navigation" aria-label="Story navigation"><button class="text-button" id="prev-story">← Previous</button><button class="text-button" id="next-story">Next story →</button></nav>';
+  $('#share-story').onclick = () => shareStory(e);
+  try { history.replaceState(null, '', '#s-' + e.id); } catch (err) {}
+  track('story/' + e.id, e.title);
   $('.back-button').onclick = closeStory; $('#prev-story').onclick = () => step(-1); $('#next-story').onclick = () => step(1);
   $('#story-view').scrollTop = 0;
   $('#map-subtitle').textContent = e.place + ' · ' + TONES[e.tone];
   flyTo(e, Math.max(zoom, 1.12)); drawPins();
   if (focus) { $('.back-button').focus({preventScroll: true}); if (root.clientWidth < 701) $('#story-view').scrollIntoView({block: 'start'}); }
 }
-function closeStory() { active = null; if (zoom <= 1.13) zoomTo(1); resumeAt = performance.now() + 2500; $('#edition-view').hidden = false; $('#story-view').hidden = true; $('#map-subtitle').textContent = 'Explore the world at your pace.'; renderFront(); }
+function closeStory() { try { history.replaceState(null, '', location.pathname + location.search); } catch (err) {} active = null; if (zoom <= 1.13) zoomTo(1); resumeAt = performance.now() + 2500; $('#edition-view').hidden = false; $('#story-view').hidden = true; $('#map-subtitle').textContent = 'Explore the world at your pace.'; renderFront(); }
+async function shareStory(e) {
+  const url = location.origin + location.pathname + '#s-' + e.id, text = e.title + ' — on the Paper Planet globe';
+  track('share/' + e.id, 'Share: ' + e.title);
+  if (navigator.share && matchMedia('(hover: none)').matches) { try { await navigator.share({title: 'Paper Planet', text, url}); return; } catch (err) { if (err.name === 'AbortError') return; } }
+  try { await navigator.clipboard.writeText(url); toast('Link copied — it opens this story on the globe.'); } catch (err) { prompt('Copy this link', url); }
+}
 function step(n) { const list = filtered(), pool = list.some(e => e.id === active?.id) ? list : byScore; openStory(pool[(pool.findIndex(e => e.id === active?.id) + n + pool.length) % pool.length].id); }
 
 function buildMixbar() {
   const glass = $('#mix-glass'), stopsEl = $('#mix-stops'), thumb = $('#mix-thumb');
   const counts = {}; events.forEach(e => counts[e.topic] = (counts[e.topic] || 0) + 1);
-  const save = () => { try { localStorage.setItem('pp-blend', JSON.stringify({order: mixOrder, pos: mixPos})); } catch (e) {} };
+  let trackT; const save = () => { try { localStorage.setItem('pp-blend', JSON.stringify({order: mixOrder, pos: mixPos})); } catch (e) {} clearTimeout(trackT); trackT = setTimeout(() => { const w = Object.keys(blendWeights()); track('blend/' + (w.join('+') || 'all')); }, 1500); };
   const pad = 22; // keeps the handle inside the glass at both ends
   const xOf = f => pad + f * (glass.clientWidth - 2 * pad);
   const fOf = px => Math.max(0, Math.min(1, (px - pad) / (glass.clientWidth - 2 * pad)));
@@ -468,7 +482,7 @@ const tour = {
     $('#tour-card').hidden = true; $('#tour-toggle').setAttribute('aria-pressed', 'false'); $('#tour-label').textContent = this.userStopped ? 'Resume tour' : 'Play tour';
   }
 };
-$('#tour-toggle').onclick = () => tour.on ? tour.stop(true) : tour.start();
+$('#tour-toggle').onclick = () => { if (tour.on) tour.stop(true); else { tour.start(); track('tour'); } };
 $('#tour-next').onclick = () => tour.next();
 $('#tour-open').onclick = () => { const id = $('#tour-open').dataset.id; if (id) openStory(id); };
 $('#tour-card').addEventListener('pointerenter', () => tour.hold()); $('#tour-card').addEventListener('pointerleave', () => tour.release());
@@ -484,6 +498,20 @@ function frame(now) {
   rotation[0] = (rotation[0] + dt * orbitSpeed / zoom / 1000) % 360; draw();
 }
 
+/* ---------- credit, about, signup ---------- */
+if (CFG.author) $('#footer-note').innerHTML = 'by ' + (CFG.authorUrl ? '<a href="' + esc(CFG.authorUrl) + '" target="_blank" rel="noopener">' + esc(CFG.author) + '</a>' : esc(CFG.author));
+$('#about-extra').innerHTML = '<b>Experimental.</b> Stories are placed and coloured by simple rules, so some will be wrong.' + (CFG.issuesUrl ? ' <a href="' + esc(CFG.issuesUrl) + '" target="_blank" rel="noopener">Report a mistake</a>.' : '') + (CFG.author ? ' Made by ' + (CFG.authorUrl ? '<a href="' + esc(CFG.authorUrl) + '" target="_blank" rel="noopener">' + esc(CFG.author) + '</a>' : esc(CFG.author)) + '.' : '');
+$('#about-button').addEventListener('click', () => track('about'));
+if (CFG.newsletter) {
+  const f = $('#signup'); f.hidden = false; root.classList.add('has-signup');
+  f.onsubmit = async ev => {
+    ev.preventDefault(); const email = $('#signup-email').value.trim(); if (!email) return;
+    const body = new FormData(); body.append('email', email); body.append('embed', '1');
+    try { await fetch('https://buttondown.com/api/emails/embed-subscribe/' + encodeURIComponent(CFG.newsletter), {method: 'POST', body, mode: 'no-cors'}); toast('Almost there — check your inbox to confirm.'); f.reset(); track('signup'); }
+    catch (err) { toast('Could not subscribe right now. Please try again.'); }
+  };
+}
+
 /* ---------- start ---------- */
 renderFront(); progress(false); new ResizeObserver(draw).observe(stage);
 try {
@@ -496,6 +524,9 @@ try {
 } catch (e) { $('#map-loading').textContent = 'The map could not load. You can still read every story on the left.'; }
 requestAnimationFrame(frame);
 initEarth();
+// A shared link (#s-<story id>) opens that story; editions roll every 3 hours, so it may be gone.
+const linked0 = (location.hash.match(/^#s-(.+)$/) || [])[1];
+if (linked0) { const hit = events.find(e => e.id === decodeURIComponent(linked0)); if (hit) { tour.userStopped = true; openStory(hit.id, false); } else { toast('That story has rolled off the globe. Here is the world right now.'); try { history.replaceState(null, '', location.pathname); } catch (e) {} } }
 // Start the tour shortly after arrival, unless the reader has asked for less motion.
 if (!reduced.matches) setTimeout(() => { if (!active && !linked && !drag && !tour.userStopped) tour.start(); }, 2500);
 })();
