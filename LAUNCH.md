@@ -59,12 +59,12 @@ GoatCounter reads `utm_source` automatically.
 
 | Channel | Link |
 |---|---|
-| X | `https://<domain>/?utm_source=x&utm_campaign=launch` |
-| Reddit r/InternetIsBeautiful | `https://<domain>/?utm_source=reddit-iib&utm_campaign=launch` |
-| Reddit r/dataisbeautiful | `https://<domain>/?utm_source=reddit-dib&utm_campaign=launch` |
-| Hacker News | `https://<domain>/?utm_source=hn&utm_campaign=launch` |
-| LinkedIn | `https://<domain>/?utm_source=linkedin&utm_campaign=launch` |
-| Product Hunt | `https://<domain>/?utm_source=producthunt&utm_campaign=launch` |
+| X | `https://paperplanet.app/?utm_source=x&utm_campaign=launch` |
+| Reddit r/InternetIsBeautiful | `https://paperplanet.app/?utm_source=reddit-iib&utm_campaign=launch` |
+| Reddit r/dataisbeautiful | `https://paperplanet.app/?utm_source=reddit-dib&utm_campaign=launch` |
+| Hacker News | `https://paperplanet.app/?utm_source=hn&utm_campaign=launch` |
+| LinkedIn | `https://paperplanet.app/?utm_source=linkedin&utm_campaign=launch` |
+| Product Hunt | `https://paperplanet.app/?utm_source=producthunt&utm_campaign=launch` |
 
 ## Launch order (one channel a week, so results don't blur)
 
