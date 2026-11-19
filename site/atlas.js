@@ -6,6 +6,8 @@ const root = document.getElementById('atlas-app'), $ = s => root.querySelector(s
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const TONES = {urgent: 'Urgent', neutral: 'Neutral', good: 'Good news'};
+const TOPICS = {world: 'World', politics: 'Politics', economy: 'Economy', conflict: 'Conflict', science: 'Science', culture: 'Culture'};
+const TOPIC_OF_ICON = {summit: 'politics', speaker: 'politics', flagpost: 'politics', ballot: 'politics', protest: 'politics', court: 'politics', migrants: 'politics', missile: 'conflict', blast: 'conflict', bank: 'economy', chart: 'economy', coin: 'economy', barrel: 'economy', oil: 'economy', factory: 'economy', tanker: 'economy', robot: 'science', medic: 'science', footballer: 'culture', guitar: 'culture'};
 const REGIONS = {europe: 'Europe', asia: 'Asia', africa: 'Africa', north_america: 'North America', south_america: 'South America', oceania: 'Oceania'};
 
 /* Monoline figures, one per kind of story (names match scripts/build_events.py). */
@@ -48,10 +50,26 @@ let data;
 try { const r = await fetch('data/events.json'); if (!r.ok) throw Error(); data = await r.json(); }
 catch (e) { $('#edition-date').textContent = 'Edition unavailable'; $('#story-list').innerHTML = '<p class="empty">The news edition could not be loaded. Please reload to try again.</p>'; $('#map-loading').textContent = 'News unavailable'; return; }
 const continentOf = e => e.continent || (e.lat < -10 && e.lon > 110 ? 'oceania' : e.lon < -30 ? (e.lat > 12 ? 'north_america' : 'south_america') : e.lon > 60 || (e.lat > 12 && e.lon > 34) ? 'asia' : e.lat > 36 ? 'europe' : 'africa');
-const events = data.events.map((e, i) => ({...e, continent: continentOf(e), score: e.score ?? ({heavy: 3, normal: 2, light: 1}[e.weight] || 2) * 100 - i}));
+const events = data.events.map((e, i) => ({...e, topic: e.topic || TOPIC_OF_ICON[e.icon] || 'world', continent: continentOf(e), score: e.score ?? ({heavy: 3, normal: 2, light: 1}[e.weight] || 2) * 100 - i}));
 const byScore = [...events].sort((a, b) => b.score - a.score);
+// Rank on a log scale so a slider can lift a smaller story past a bigger one without erasing size entirely.
+const logMax = Math.log(1 + Math.max(...events.map(e => e.score), 1));
+const mixed = e => Math.log(1 + e.score) / logMax * Math.pow(mixWeight(e), 1.6);
 const isSeed = /seed/i.test(data.day.label || '') || /seed/.test(data.day.edition || '');
 
+// The reader's blend: topics sit in a row on one bar; the handle's position between two
+// neighbouring topics favours those two (at most two), in proportion to how close it is.
+let mixOrder = ['politics', 'economy', 'conflict', 'science', 'culture', 'world'], mixPos = 0;
+try { const saved = JSON.parse(localStorage.getItem('pp-blend') || 'null'); if (saved) { if (Array.isArray(saved.order) && saved.order.length === mixOrder.length && saved.order.every(k => TOPICS[k])) mixOrder = saved.order; if (Number.isFinite(saved.pos)) mixPos = Math.max(0, Math.min(1, saved.pos)); } } catch (e) {}
+const mixStops = () => ['all', ...mixOrder];
+function blendWeights() {
+  const st = mixStops(), n = st.length - 1, x = mixPos * n, k = Math.min(n - 1, Math.floor(x)), t = x - k, w = {};
+  if (st[k] !== 'all' && 1 - t > .02) w[st[k]] = 1 - t;
+  if (st[k + 1] !== 'all' && t > .02) w[st[k + 1]] = t;
+  return w;
+}
+const balanced = () => Object.keys(blendWeights()).length === 0;
+const mixWeight = e => 1 + 3 * (blendWeights()[e.topic] || 0);
 let seen = new Set(), active = null, filter = 'all', query = '', view = 'globe', rotation = [-16, -18, 0], zoom = 1, projection, world, animation;
 const ZMAX = 6;
 const flat = {z: 1, lon: 0, lat: 0, k0: 1};
@@ -91,7 +109,7 @@ let toastTimer;
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600); }
 
 /* ---------- front page ---------- */
-const filtered = () => byScore.filter(e => (filter === 'all' || e.tone === filter) && (!query || [e.title, e.place, e.country, e.source, REGIONS[e.continent]].join(' ').toLowerCase().includes(query)));
+const filtered = () => [...byScore].sort((a, b) => mixed(b) - mixed(a)).filter(e => (filter === 'all' || e.tone === filter) && (!query || [e.title, e.place, e.country, e.source, REGIONS[e.continent]].join(' ').toLowerCase().includes(query)));
 function leadNumber(e) {
   const custom = (e.stats || []).find(s => !/news sources|mentions tracked/i.test(s.l));
   if (custom) return {v: custom.v, l: custom.l};
@@ -107,14 +125,16 @@ function renderFront() {
   $$('[data-count]').forEach(c => c.textContent = counts[c.dataset.count] || 0);
   const list = filtered(), seenCls = e => seen.has(e.id) ? ' is-seen' : '';
   if (!list.length) { $('#lead').innerHTML = ''; $('#secondary').innerHTML = ''; $('#story-list').innerHTML = '<p class="empty">No stories match. Try another place or clear your search.</p>'; frontIds = new Set(); drawPins(); return; }
-  const [lead, ...others] = list;
+  const lead = list[0], top = balanced() ? [] : list.slice(1, 5), others = list.filter(e => e !== lead && !top.includes(e));
   frontIds = new Set([lead.id]);
-  $('#lead').innerHTML = '<button class="lead story-link' + seenCls(lead) + '" data-id="' + esc(lead.id) + '" data-tone="' + esc(lead.tone) + '">' + kicker(lead) + '<h2>' + esc(lead.title) + '</h2><p>' + esc(lead.what) + '</p>' + (lead.source ? '<span class="lead-source">' + esc(lead.source) + '</span>' : '') + '</button>';
-  $('#secondary').innerHTML = '';
+  const reports = lead.reports > 1 ? ' · ' + lead.reports + ' reports' : '';
+  $('#lead').innerHTML = '<button class="lead story-link' + seenCls(lead) + '" data-id="' + esc(lead.id) + '" data-tone="' + esc(lead.tone) + '">' + kicker(lead) + '<h2>' + esc(lead.title) + '</h2><p>' + esc(lead.what) + '</p>' + (lead.source ? '<span class="lead-source">' + esc(lead.source) + reports + '</span>' : '') + '</button>';
+  const rowHTML = e => '<button class="row story-link' + seenCls(e) + '" data-id="' + esc(e.id) + '" data-tone="' + esc(e.tone) + '"><i class="tone-dot ' + esc(e.tone) + '"></i><div><span class="place">' + esc(e.place) + (e.country && e.country !== e.place ? ', ' + esc(e.country) : '') + '</span><h4>' + esc(e.title) + '</h4></div></button>';
+  $('#secondary').innerHTML = top.length ? '<section class="region in-focus"><div class="region-head"><b>Top of your mix</b><span>' + top.length + '</span></div>' + top.map(rowHTML).join('') + '</section>' : '';
   const groups = {}; others.forEach(e => (groups[e.continent] ||= []).push(e));
   $('#story-list').innerHTML = Object.entries(groups).sort((a, b) => b[1].length - a[1].length).map(([c, list]) =>
     '<section class="region"><div class="region-head"><b>' + (REGIONS[c] || 'Elsewhere') + '</b><span>' + list.length + '</span></div>' +
-    list.map(e => '<button class="row story-link' + seenCls(e) + '" data-id="' + esc(e.id) + '" data-tone="' + esc(e.tone) + '"><i class="tone-dot ' + esc(e.tone) + '"></i><div><span class="place">' + esc(e.place) + (e.country && e.country !== e.place ? ', ' + esc(e.country) : '') + '</span><h4>' + esc(e.title) + '</h4></div></button>').join('') + '</section>').join('');
+    list.map(rowHTML).join('') + '</section>').join('');
   $$('.story-link').forEach(b => {
     b.onclick = () => openStory(b.dataset.id);
     b.onmouseenter = b.onfocus = () => linkStory(b.dataset.id, true);
@@ -169,6 +189,58 @@ function openStory(id, focus = true) {
 function closeStory() { active = null; if (zoom <= 1.13) zoomTo(1); resumeAt = performance.now() + 2500; $('#edition-view').hidden = false; $('#story-view').hidden = true; $('#map-subtitle').textContent = 'Explore the world at your pace.'; renderFront(); }
 function step(n) { const list = filtered(), pool = list.some(e => e.id === active?.id) ? list : byScore; openStory(pool[(pool.findIndex(e => e.id === active?.id) + n + pool.length) % pool.length].id); }
 
+function buildMixbar() {
+  const glass = $('#mix-glass'), stopsEl = $('#mix-stops'), thumb = $('#mix-thumb');
+  const counts = {}; events.forEach(e => counts[e.topic] = (counts[e.topic] || 0) + 1);
+  const save = () => { try { localStorage.setItem('pp-blend', JSON.stringify({order: mixOrder, pos: mixPos})); } catch (e) {} };
+  const pad = 22; // keeps the handle inside the glass at both ends
+  const xOf = f => pad + f * (glass.clientWidth - 2 * pad);
+  const fOf = px => Math.max(0, Math.min(1, (px - pad) / (glass.clientWidth - 2 * pad)));
+  let raf = 0, sorting = null;
+  const apply = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => { if (active) drawPins(); else renderFront(); }); };
+  function paint() {
+    const st = mixStops(), n = st.length - 1, w = blendWeights();
+    stopsEl.innerHTML = st.map((k, i) => '<span class="mix-stop' + (k === 'all' ? ' is-all' : '') + (w[k] ? ' is-on' : '') + (sorting && sorting.k === k ? ' is-moving' : '') + '" data-k="' + k + '" title="' + (k === 'all' ? 'No preference' : TOPICS[k] + ': ' + (counts[k] || 0) + ' stories · drag to move') + '" style="left:' + (sorting && sorting.k === k ? sorting.x : xOf(i / n)) + 'px;--w:' + (w[k] || 0).toFixed(2) + '">' + (k === 'all' ? 'All' : TOPICS[k]) + '</span>').join('');
+    thumb.style.left = xOf(mixPos) + 'px'; $('#mix-fill').style.width = Math.max(0, xOf(mixPos) - 14) + 'px';
+    const parts = Object.entries(w).sort((a, b) => b[1] - a[1]);
+    const txt = !parts.length ? 'Balanced' : parts.length === 1 || parts[0][1] > .92 ? TOPICS[parts[0][0]] : parts.map(([k, v]) => TOPICS[k] + ' ' + Math.round(v * 100) + '%').join(' · ');
+    $('#mix-readout').textContent = txt; thumb.setAttribute('aria-valuenow', Math.round(mixPos * 100)); thumb.setAttribute('aria-valuetext', txt);
+  }
+  // One pointer handler for the whole bar: a press on a topic label reorders it; anywhere else moves the handle.
+  let mode = null;
+  glass.addEventListener('pointerdown', e => {
+    const stop = e.target.closest('.mix-stop:not(.is-all)');
+    glass.setPointerCapture(e.pointerId);
+    if (stop) {
+      const fav = Object.entries(blendWeights()).sort((a, b) => b[1] - a[1])[0];
+      mode = 'sort'; sorting = {k: stop.dataset.k, x: e.clientX - glass.getBoundingClientRect().left, fav: fav && fav[0]};
+      glass.classList.add('is-sorting'); paint(); return;
+    }
+    mode = 'slide'; glass.classList.add('is-dragging'); mixPos = fOf(e.clientX - glass.getBoundingClientRect().left); paint(); apply();
+  });
+  glass.addEventListener('pointermove', e => {
+    if (!mode) return;
+    const x = e.clientX - glass.getBoundingClientRect().left;
+    if (mode === 'slide') { mixPos = fOf(x); paint(); apply(); return; }
+    sorting.x = Math.max(pad, Math.min(glass.clientWidth - pad, x));
+    const n = mixOrder.length, slot = Math.max(1, Math.min(n, Math.round(fOf(x) * n))) - 1, from = mixOrder.indexOf(sorting.k);
+    if (slot !== from) {
+      mixOrder.splice(from, 1); mixOrder.splice(slot, 0, sorting.k);
+      if (sorting.fav) mixPos = mixStops().indexOf(sorting.fav) / n; // the handle stays on the topic it favoured
+      apply();
+    }
+    paint();
+  });
+  const end = () => {
+    if (mode === 'slide') { const n = mixStops().length - 1, near = Math.round(mixPos * n) / n; if (Math.abs(near - mixPos) < .035) { mixPos = near; apply(); } }
+    mode = null; sorting = null; glass.classList.remove('is-dragging', 'is-sorting'); paint(); save();
+  };
+  glass.addEventListener('pointerup', end); glass.addEventListener('pointercancel', end);
+  thumb.addEventListener('keydown', e => { const d = {ArrowLeft: -.02, ArrowDown: -.02, ArrowRight: .02, ArrowUp: .02}[e.key]; if (!d) return; e.preventDefault(); mixPos = Math.max(0, Math.min(1, mixPos + d)); paint(); apply(); save(); });
+  new ResizeObserver(paint).observe(glass);
+  paint();
+}
+buildMixbar();
 $$('[data-filter]').forEach(b => b.onclick = () => { filter = b.dataset.filter; $$('[data-filter]').forEach(x => x.setAttribute('aria-pressed', String(x === b))); if (active) closeStory(); else renderFront(); });
 $('#search').oninput = e => { query = e.target.value.trim().toLowerCase(); renderFront(); };
 $('#random-button').onclick = () => { const list = filtered(); if (!list.length) return; const unread = list.filter(e => !seen.has(e.id)), pool = unread.length ? unread : list; openStory(pool[Math.floor(Math.random() * pool.length)].id); };
@@ -305,6 +377,7 @@ function drawPins() {
     b.classList.toggle('is-active', e.id === active?.id);
     b.classList.toggle('is-seen', seen.has(e.id)); b.querySelector('.fig').classList.toggle('is-seen', seen.has(e.id));
     b.classList.toggle('dim', !!active && e.id !== active.id);
+    const bal = balanced(), w = mixWeight(e); b.classList.toggle('off-focus', !bal && w < 1.3 && e.id !== active?.id); b.style.setProperty('--mixop', bal || w >= 1.3 ? 1 : .42);
     if (!on) return;
     placed.push({e, b, l, x, y, ox: x, oy: y, r: sizeOf(e) / 2 + 2, edge: d});
   });

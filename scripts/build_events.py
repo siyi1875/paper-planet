@@ -79,6 +79,17 @@ ICON_RULES = [
 ]
 ICON_RULES = [(name, re.compile(rx, re.I)) for name, rx in ICON_RULES]
 
+# Figure -> topic, for the reader's "focus" choice on the page.
+TOPIC_OF_ICON = {
+    **dict.fromkeys(["summit", "speaker", "flagpost", "ballot", "protest", "court", "migrants"], "politics"),
+    **dict.fromkeys(["missile", "blast"], "conflict"),
+    **dict.fromkeys(["bank", "chart", "coin", "barrel", "oil", "factory", "tanker"], "economy"),
+    **dict.fromkeys(["robot", "medic"], "science"),
+    **dict.fromkeys(["footballer", "guitar"], "culture"),
+}  # everything else (floods, fires, quakes, accidents) is general world news
+# Make sure the smaller topics are represented, so choosing them on the page shows something.
+TOPIC_MIN = {"economy": 3, "science": 2, "culture": 3, "conflict": 2}
+
 # CAMEO root code -> figure, used when no keyword matched.
 CAMEO_ICON = {
     "01": "speaker", "02": "speaker", "03": "speaker", "04": "speaker", "05": "flagpost",
@@ -337,13 +348,49 @@ def strip_site_suffix(title: str, domain: str) -> str:
     return title.strip()
 
 
+CHARSET_RX = re.compile(rb"""<meta[^>]+charset=["']?\s*([\w-]+)""", re.I)
+
+
+def decode_page(r: requests.Response) -> str:
+    """Decode with the charset the page declares. requests falls back to ISO-8859-1 when the
+    HTTP header has none, which turns UTF-8 punctuation into 'â€™'."""
+    raw = r.content[:400_000]
+    enc = None
+    if "charset=" in r.headers.get("content-type", "").lower():
+        enc = r.encoding
+    if not enc:
+        m = CHARSET_RX.search(raw[:8192])
+        enc = m.group(1).decode("ascii", "ignore") if m else "utf-8"
+    try:
+        return raw.decode(enc, errors="replace")
+    except LookupError:
+        return raw.decode("utf-8", errors="replace")
+
+
+MOJIBAKE = re.compile("[\u00c2\u00c3\u00e2][\u0080-\u00bf\u2010-\u203a\u20ac\u0152\u0153\u0160\u0161\u0178\u017d\u017e\u0192\u02c6\u02dc\u2122]")
+
+
+def fix_mojibake(text: str) -> str:
+    """Repair text that was UTF-8 but got decoded as Latin-1/Windows-1252 somewhere upstream."""
+    if not text or not MOJIBAKE.search(text):
+        return text
+    for enc in ("cp1252", "latin-1"):
+        try:
+            fixed = text.encode(enc).decode("utf-8")
+            if not MOJIBAKE.search(fixed):
+                return fixed
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            continue
+    return text
+
+
 def fetch_page_meta(url: str, domain: str, session: requests.Session) -> dict | None:
     try:
         r = session.get(url, timeout=HTTP_TIMEOUT, allow_redirects=True,
                         headers={"User-Agent": UA, "Accept-Language": "en"})
         if r.status_code != 200 or "html" not in r.headers.get("content-type", "html"):
             return None
-        page = r.text[:300_000]
+        page = decode_page(r)
     except Exception:
         return None
     meta = {}
@@ -357,8 +404,9 @@ def fetch_page_meta(url: str, domain: str, session: requests.Session) -> dict | 
     if not title:
         m = TITLE_RX.search(page)
         title = m.group(1) if m else ""
-    title = strip_site_suffix(clean_text(title, 200), domain)
+    title = strip_site_suffix(clean_text(fix_mojibake(title), 200), domain)
     title = re.sub(r"^(news|breaking|update|exclusive|video|photos?)\s*[:|-]\s*", "", title, flags=re.I)
+    title = re.sub(r"\s+[-|–]\s+[\w.-]+\.(com|net|org|co\.uk|com\.au|in|ng|co)$", "", title, flags=re.I)
     if len(title) < 18 or BAD_TITLE.search(title):
         return None
     locale = (meta.get("og:locale") or "en").lower()
@@ -366,7 +414,7 @@ def fetch_page_meta(url: str, domain: str, session: requests.Session) -> dict | 
         return None
     if not looks_english(title):
         return None
-    desc = clean_text(meta.get("og:description") or meta.get("description")
+    desc = clean_text(fix_mojibake(meta.get("og:description") or "") or meta.get("og:description") or meta.get("description")
                       or meta.get("twitter:description") or "", 420)
     if desc and (desc.lower().startswith(title.lower()[:40]) and len(desc) < len(title) + 20):
         desc = ""
@@ -522,6 +570,64 @@ def title_key(title: str) -> str:
 # ---------------------------------------------------------------------------
 # 5. Select a globally spread set
 # ---------------------------------------------------------------------------
+CLUSTER_STOP = set("""the a an of in on to for and as at by with is are was were be been after over from into
+about amid says said says new more than will would could should its it this that their his her they them
+what why how who when where which not but has have had first last year years week day days amid ahead""".split())
+
+
+def story_tokens(st: dict) -> set[str]:
+    """Distinctive words of a story: headline plus the first sentence of the summary."""
+    text = st["title"] + " " + re.split(r"(?<=[.!?])\s", st.get("what") or "", maxsplit=1)[0]
+    toks = set()
+    for w in re.findall(r"[A-Za-z][A-Za-z'’-]+", text):
+        base = re.sub(r"['’]s$", "", w)
+        if len(base) >= 4 or (len(base) >= 2 and base[0].isupper()):
+            lw = base.lower()
+            if lw not in CLUSTER_STOP:
+                toks.add(lw)
+    return toks
+
+
+def cluster_stories(stories: list[dict]) -> list[dict]:
+    """Merge several reports of the same event (four outlets on one summit) into one story whose
+    score adds up their coverage. GDELT scores each article alone, so a big story split across
+    many articles otherwise ranks below a small one covered by a single long article."""
+    if not stories:
+        return stories
+    toks = {id(st): story_tokens(st) for st in stories}
+    df = defaultdict(int)
+    for t in toks.values():
+        for w in t:
+            df[w] += 1
+    common = max(3, len(stories) // 12)  # words in too many headlines (e.g. a president's name) count less
+    clusters: list[list[dict]] = []
+    for st in sorted(stories, key=lambda s: s["score"], reverse=True):
+        mine = toks[id(st)]
+        for cl in clusters:
+            shared = mine & toks[id(cl[0])]
+            strong = [w for w in shared if df[w] <= common]
+            if len(shared) >= 3 or (len(shared) >= 2 and strong):
+                cl.append(st)
+                break
+        else:
+            clusters.append([st])
+    out = []
+    for cl in clusters:
+        if len(cl) == 1:
+            out.append(cl[0]); continue
+        # Headline that best represents the group: shares the most words with the others.
+        rep_st = max(cl, key=lambda s: (sum(len(toks[id(s)] & toks[id(o)]) for o in cl if o is not s), s["score"]))
+        merged = dict(rep_st)
+        # Several outlets independently reporting the same event is the strongest sign it matters:
+        # add their coverage together, then a bonus for each extra report.
+        merged["score"] = round(sum(s["score"] for s in cl) * (1 + 0.25 * (len(cl) - 1)), 1)
+        merged["reports"] = len(cl)
+        merged["stats"] = [{"v": str(len(cl)), "l": "reports on this story"}] + [x for x in rep_st["stats"] if x["l"] != "reports on this story"]
+        out.append(merged)
+    out.sort(key=lambda s: s["score"], reverse=True)
+    return out
+
+
 def select_spread(stories: list[dict], count: int) -> list[dict]:
     chosen, per_country, per_cont, seen_titles = [], defaultdict(int), defaultdict(int), set()
 
@@ -539,6 +645,13 @@ def select_spread(stories: list[dict], count: int) -> list[dict]:
             if per_cont[cont] >= need:
                 break
             if st["continent"] == cont and st not in chosen and ok(st):
+                take(st)
+    # Give the smaller topics a few places, so a reader's chosen focus is never empty.
+    for topic, need in TOPIC_MIN.items():
+        for st in stories:
+            if sum(1 for c in chosen if c.get("topic") == topic) >= need:
+                break
+            if st.get("topic") == topic and st not in chosen and ok(st):
                 take(st)
     # Reserve a few places for good news so the green filter is never empty.
     for st in stories:
@@ -603,7 +716,7 @@ def build(hours: float, count: int, pool: int, workers: int) -> dict:
             tone, icon, weight = classify(c, meta["title"], meta["summary"])
             st = {
                 "id": slug(meta["title"]),
-                "tone": tone, "icon": icon, "weight": weight,
+                "tone": tone, "icon": icon, "weight": weight, "topic": TOPIC_OF_ICON.get(icon, "world"),
                 "title": meta["title"],
                 "place": c["place"], "country": c["country"] or c["place"],
                 "flag": flag_from_iso(c["iso"]), "iso": c["iso"] or "",
@@ -620,6 +733,8 @@ def build(hours: float, count: int, pool: int, workers: int) -> dict:
             stories.append(st)
     stories.sort(key=lambda s: s["score"], reverse=True)
     print(f"  {len(stories)} stories with usable headlines")
+    stories = cluster_stories(stories)
+    print(f"  {len(stories)} after grouping reports of the same story")
 
     chosen = select_spread(stories, count)
     # unique ids
